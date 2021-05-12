@@ -6,8 +6,11 @@ import ipaddress
 
 _simple_tcp_socket_pool = socketpool.SocketPool(wifi.radio)
 
+"""wifi"""
 
 class SimpleTcp:
+    
+    """SimpleTcp"""
     def __init__(self):
         self.server_socket = None
         self.client_socket = _simple_tcp_socket_pool.socket(_simple_tcp_socket_pool.AF_INET, _simple_tcp_socket_pool.SOCK_STREAM)
@@ -156,7 +159,7 @@ class SimpleTcp:
 
 
 class SimpleWifi:
-    
+    """SimpleWfi"""
     def __init__(self):
         self.simple_tcp = SimpleTcp()
         self.ip = None
@@ -370,7 +373,7 @@ class SimpleHttp:
     def respond(self, response, code=200):
         r = SimpleHttpResponse(code, response)
         path = __file__
-        path = path[:path.find("simple_wifi.py")]+"template.html"
+        path = path[:path.find("__init__.py")]+"template.html"
         f = open(path)
         r.set_text(f.read())
         f.close()

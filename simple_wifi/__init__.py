@@ -16,7 +16,7 @@ class SimpleTcp:
         self.client_socket = _simple_tcp_socket_pool.socket(_simple_tcp_socket_pool.AF_INET, _simple_tcp_socket_pool.SOCK_STREAM)
         self.current_client = None
     
-    def start_server(self, port=80):
+    def start_server(self, port=2000):
         if self.server_socket:
             self.server_socket.close()
         self.server_socket = _simple_tcp_socket_pool.socket(_simple_tcp_socket_pool.AF_INET, _simple_tcp_socket_pool.SOCK_STREAM)
@@ -81,9 +81,11 @@ class SimpleTcp:
         try:
             numbytes = self.current_client[0].recvfrom_into(buff)
         except OSError as e:
-            print(e)
+            
             if timeout:
                 self.current_client[0].setblocking(True)
+            else:
+                print(e)
             return bytearray()
 
         if timeout:
@@ -107,7 +109,7 @@ class SimpleTcp:
             self.current_client[0].close()
         self.current_client = None
     
-    def connect(self, ip, port=80):
+    def connect(self, ip, port=2000):
         # if not self.client_socket:
         #     self.client_socket = _simple_tcp_socket_pool.socket(_simple_tcp_socket_pool.AF_INET, _simple_tcp_socket_pool.SOCK_STREAM)
         
@@ -171,7 +173,7 @@ class SimpleWifi:
     def get_last_connected_ip(self):
         return self.last_ip
 
-    def connect(self, ssid, pwd, static_ip=None, server_port=80):
+    def connect(self, ssid, pwd, static_ip=None, server_port=2000):
         ip = None
         while not ip:
             try:
@@ -188,10 +190,10 @@ class SimpleWifi:
 
         self.simple_tcp.start_server(server_port)
         self.ip = wifi.radio.ipv4_address
-        print(self.ip)
+        print("IP Galaxia :"+str(self.ip))
         return self.ip
     
-    def send(self, data, ip, port=80):
+    def send(self, data, ip, port=2000):
         try:
             self.simple_tcp.connect(ip, port)
             # length = len(data)
@@ -225,15 +227,21 @@ class SimpleWifi:
             if ip == None or str(client_ip[0]) == str(ip):
                 data = bytearray()
                 while (timeout == None or (time.monotonic() - timestamp) < timeout):
-                    d = self.simple_tcp.receive_from_client(0)
+                    force_timeout = 0
+                    if protocol != "http" and len(data) > 0 :
+                        force_timeout = 0.4 #if reception started force timeout
+                    
+                    d = self.simple_tcp.receive_from_client(force_timeout)
                     if len(d) > 0:
                         for b in d:
                             data.append(b)
                     else:  
                         self.simple_tcp.close_client()
                         return data.decode("utf-8")
+
                     request = data.decode("utf8-8")
-                    if protocol == "http" and request.endswith("\r\n\r\n"):
+                    
+                    if (protocol == "http" and request.endswith("\r\n\r\n")):
                         return request
 
 
@@ -294,10 +302,11 @@ class SimpleHttpResponse:
         self.code = code
         self.headers = headers
         self.text = str(text)
+        self.content_type = "text/html"
     
     def __str__(self):
         response = "HTTP/1.1 "+str(self.code)+"\r\n"
-        response += "content-type: text/html\r\n"
+        response += "content-type: "+self.content_type+"\r\n"
         response += "\r\n"
         response += self.text
         return response
@@ -370,7 +379,7 @@ class SimpleHttp:
                 self.request = self.__parse_request(request)
                 return self.request
 
-    def respond(self, response, code=200):
+    def respond_with_html(self, response, code=200):
         r = SimpleHttpResponse(code, response)
         path = __file__
         path = path[:path.find("__init__.py")]+"template.html"
@@ -380,3 +389,14 @@ class SimpleHttp:
         r.replace("request", self.request.get_url())
         r.replace("response", str(response))
         return self.simple_wifi.send_to_client(str(r))
+
+    def respond(self, response, code=200):
+        r = SimpleHttpResponse(code, response)
+        r.content_type = "text/plain"
+        r.set_text(response)
+        
+        return self.simple_wifi.send_to_client(str(r))
+
+
+def version():
+    return "1.0.1"

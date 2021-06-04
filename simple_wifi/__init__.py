@@ -180,7 +180,10 @@ class SimpleWifi:
                 wifi.radio.connect(ssid, pwd)
                 ip = wifi.radio.ipv4_address
             except ConnectionError as e:
-                print(e)
+                if str(e) == "Aucun réseau avec ce ssid":
+                    print("Pas de réseau avec SSID = "+ssid)
+                else:
+                    print(e)
                 pass
 
         
@@ -399,4 +402,4 @@ class SimpleHttp:
 
 
 def version():
-    return "1.0.1"
+    return "1.0.2"

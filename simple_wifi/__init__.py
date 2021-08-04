@@ -16,12 +16,15 @@ class SimpleTcp:
         self.client_socket = _simple_tcp_socket_pool.socket(_simple_tcp_socket_pool.AF_INET, _simple_tcp_socket_pool.SOCK_STREAM)
         self.current_client = None
     
-    def start_server(self, port=2000):
+    def start_server(self, ip=None, port=2000):
+        if ip == None:
+            ip = wifi.radio.ipv4_address
+
         if self.server_socket:
             self.server_socket.close()
         self.server_socket = _simple_tcp_socket_pool.socket(_simple_tcp_socket_pool.AF_INET, _simple_tcp_socket_pool.SOCK_STREAM)
         #Création du serveur
-        self.server_socket.bind((str(wifi.radio.ipv4_address),port))
+        self.server_socket.bind((str(ip),port))
         self.server_socket.listen(1)
 
     def monitor_server(self):
@@ -165,10 +168,14 @@ class SimpleWifi:
     def __init__(self):
         self.simple_tcp = SimpleTcp()
         self.ip = None
+        self.ip_ap = None
         self.last_ip = None
 
     def get_my_ip(self):
         return self.ip
+    
+    def get_my_ip_ap(self):
+        return self.ip_ap
     
     def get_last_connected_ip(self):
         return self.last_ip
@@ -191,10 +198,24 @@ class SimpleWifi:
             addr = ipaddress.IPv4Address(static_ip)
             wifi.radio.set_ipv4_address(addr)
 
-        self.simple_tcp.start_server(server_port)
         self.ip = wifi.radio.ipv4_address
+        self.simple_tcp.start_server(self.ip, server_port)
+
         print("IP Galaxia :"+str(self.ip))
         return self.ip
+
+    def start_access_point(self, ssid="Thingz-Galaxia", password="", server_port=2000):
+        if(len(password) > 0):
+            wifi.radio.start_ap(ssid, password)
+        else:
+            wifi.radio.start_ap(ssid)
+
+        self.ip_ap = wifi.radio.ipv4_address_ap
+        self.simple_tcp.start_server(self.ip_ap, server_port)
+        
+        print("IP Galaxia :"+str(self.ip_ap))
+        return self.ip_ap
+
     
     def send(self, data, ip, port=2000):
         try:
@@ -402,4 +423,4 @@ class SimpleHttp:
 
 
 def version():
-    return "1.0.2"
+    return "1.0.3"

@@ -221,7 +221,7 @@ class SimpleWifi:
         try:
             self.simple_tcp.connect(ip, port)
             # length = len(data)
-            b = bytes(str(data), "utf-8")
+            b = bytes(str(data)+"\r\n", "utf-8")
             # b.append(length & 0xff)
             # b.append((length >> 8) & 0xff)
             # b.append((length >> 16) & 0xff)
@@ -238,7 +238,7 @@ class SimpleWifi:
             return False
         return True
 
-    def receive(self, protocol=None, ip=None, timeout=None):
+    def receive(self, protocol=None, ip=None, timeout=None, stopSequence="\r\n"):
         timestamp = time.monotonic() 
         self.simple_tcp.close_client()
         while True:
@@ -253,7 +253,7 @@ class SimpleWifi:
                 while (timeout == None or (time.monotonic() - timestamp) < timeout):
                     force_timeout = 0
                     if protocol != "http" and len(data) > 0 :
-                        force_timeout = 0.4 #if reception started force timeout
+                        force_timeout = 1 #if reception started force timeout
                     
                     d = self.simple_tcp.receive_from_client(force_timeout)
                     if len(d) > 0:
@@ -265,8 +265,11 @@ class SimpleWifi:
 
                     request = data.decode("utf8-8")
                     
-                    if (protocol == "http" and request.endswith("\r\n\r\n")):
+                    if protocol == "http" and request.endswith("\r\n\r\n"):
                         return request
+                    
+                    if protocol != "http" and request.endswith(stopSequence):
+                        return request[:request.find(stopSequence)]
 
 
                 # if timeout != None and (time.monotonic() - timestamp) >= timeout:

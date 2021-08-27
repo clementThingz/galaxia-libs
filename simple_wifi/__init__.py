@@ -200,7 +200,7 @@ class SimpleWifi:
 
         self.ip = wifi.radio.ipv4_address
         self.simple_tcp.start_server(self.ip, server_port)
-
+        print("Connecté au point d'accès")
         print("IP Galaxia :"+str(self.ip))
         return self.ip
 
@@ -261,14 +261,17 @@ class SimpleWifi:
                             data.append(b)
                     else:  
                         self.simple_tcp.close_client()
+                        print("Message reçu de "+str(self.last_ip))
                         return data.decode("utf-8")
 
                     request = data.decode("utf8-8")
                     
                     if protocol == "http" and request.endswith("\r\n\r\n"):
+                        print("Message reçu de "+str(self.last_ip))
                         return request
                     
                     if protocol != "http" and request.endswith(stopSequence):
+                        print("Message reçu de "+str(self.last_ip))
                         return request[:request.find(stopSequence)]
 
 
@@ -426,4 +429,4 @@ class SimpleHttp:
 
 
 def version():
-    return "1.0.4"
+    return "1.0.5"

@@ -40,7 +40,7 @@ class SimpleTcp:
                 pass
             self.server_socket.setblocking(True)
 
-    def wait_client(self, timeout=None):
+    def wait_client(self, timeout=None, debug=True):
         if not self.server_socket:
             raise AttributeError("Server not started")
         if self.current_client:
@@ -52,7 +52,8 @@ class SimpleTcp:
         try:
             client = self.server_socket.accept()
         except OSError as e:
-            print(e)
+            if debug:
+                print(e)
             t, value, trace = sys.exc_info()
             code = value.args[0]
             if code == 116 or code == 11: #TIMEOUT == 116
@@ -238,11 +239,11 @@ class SimpleWifi:
             return False
         return True
 
-    def receive(self, protocol=None, ip=None, timeout=None, stopSequence="\r\n"):
+    def receive(self, protocol=None, ip=None, timeout=None, stopSequence="\r\n", block=True):
         timestamp = time.monotonic() 
         self.simple_tcp.close_client()
         while True:
-            client_ip = self.simple_tcp.wait_client(timeout)
+            client_ip = self.simple_tcp.wait_client(timeout if block else 0, debug=True if block else False)
             #print(client_ip)
             if not client_ip:
                 return ""
@@ -261,17 +262,17 @@ class SimpleWifi:
                             data.append(b)
                     else:  
                         self.simple_tcp.close_client()
-                        print("Message reçu de "+str(self.last_ip))
+                        print("Message de "+str(self.last_ip))
                         return data.decode("utf-8")
 
                     request = data.decode("utf8-8")
                     
                     if protocol == "http" and request.endswith("\r\n\r\n"):
-                        print("Message reçu de "+str(self.last_ip))
+                        print("Message de "+str(self.last_ip))
                         return request
                     
                     if protocol != "http" and request.endswith(stopSequence):
-                        print("Message reçu de "+str(self.last_ip))
+                        print("Message de "+str(self.last_ip))
                         return request[:request.find(stopSequence)]
 
 
@@ -400,6 +401,20 @@ class SimpleHttp:
             return r
         else:
             raise AttributeError("Unknown request:"+str(request))
+    
+    def get_pending_request(self):
+        #Not connected
+        if wifi.radio.ipv4_address == None:
+            return None
+        try:
+            request = self.simple_wifi.receive(protocol="http", block=False)
+        except AttributeError:
+            return None
+        #print(len(request))
+        if len(request) > 0:
+            self.request = self.__parse_request(request)
+            return self.request
+        return None
 
     def wait_request(self):
         while True:
@@ -409,15 +424,20 @@ class SimpleHttp:
                 self.request = self.__parse_request(request)
                 return self.request
 
-    def respond_with_html(self, response, code=200):
+    def respond_with_html(self, response, code=200, template="template.html", tags=None):
+        if tags == None:
+            tags = [('request', self.request.get_url())]
         r = SimpleHttpResponse(code, response)
         path = __file__
-        path = path[:path.find("__init__.py")]+"template.html"
+        path = path[:path.find("__init__.py")]+str(template)
         f = open(path)
         r.set_text(f.read())
         f.close()
-        r.replace("request", self.request.get_url())
-        r.replace("response", str(response))
+
+        r.replace('response', str(response))
+        for tag, value in tags:
+            r.replace(tag, str(value))
+
         return self.simple_wifi.send_to_client(str(r))
 
     def respond(self, response, code=200):
@@ -429,4 +449,4 @@ class SimpleHttp:
 
 
 def version():
-    return "1.0.5"
+    return "1.0.7"

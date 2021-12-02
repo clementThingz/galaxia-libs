@@ -55,6 +55,7 @@ class SimpleTcp:
             if debug:
                 print(e)
             t, value, trace = sys.exc_info()
+            #print(value)
             code = value.args[0]
             if code == 116 or code == 11: #TIMEOUT == 116
                 self.server_socket.setblocking(True)
@@ -240,17 +241,20 @@ class SimpleWifi:
         return True
 
     def receive(self, protocol=None, ip=None, timeout=None, stopSequence="\r\n", block=True):
-        timestamp = time.monotonic() 
+         
         self.simple_tcp.close_client()
         while True:
             client_ip = self.simple_tcp.wait_client(timeout if block else 0, debug=True if block else False)
             #print(client_ip)
             if not client_ip:
+                if block:
+                    continue
                 return ""
             
             self.last_ip = client_ip[0]
             if ip == None or str(client_ip[0]) == str(ip):
                 data = bytearray()
+                timestamp = time.monotonic()
                 while (timeout == None or (time.monotonic() - timestamp) < timeout):
                     force_timeout = 0
                     if protocol != "http" and len(data) > 0 :
@@ -305,6 +309,12 @@ class SimpleHttpRequest:
         self.method = method
         self.url = url
         self.params = params
+        self.returned = False
+        self.timestamp = time.monotonic()
+
+    #The request has been returned to the user
+    def set_returned(self):
+        self.returned = True
 
     def get_method(self):
         return self.method
@@ -326,6 +336,9 @@ class SimpleHttpRequest:
     
     def add_params(self, key, value):
         self.params[key] = value
+    
+    def get_timestamp(self):
+        return self.timestamp
 
 class SimpleHttpResponse:
 
@@ -371,6 +384,13 @@ class SimpleHttp:
     def __init__(self, simple_wifi):
         self.simple_wifi = simple_wifi
         self.request = None
+        #url map to webpage who need to be resolve in background (through a call of handle_web_page/get_pending_request())
+        self.web_page_urls = []
+        #Lock for wait request
+        self.wait = False
+        self.wait_request_has_been_called = False
+        self.request_timeout = 5
+
 
     def __get_params(self, url):
         d = dict()
@@ -380,7 +400,7 @@ class SimpleHttp:
             pair = p.split("=")
             if len(pair) == 2:
                 d[pair[0]] = pair[1]
-        print(params)
+        #print(params)
         
         return d
 
@@ -390,7 +410,8 @@ class SimpleHttp:
             key_http = request.find("HTTP")
             if key_http == -1:
                 raise AttributeError("Malformed request, http not found:"+str(request))
-            url_complete = request[4:key_http].split(' ')[0]
+            url_complete = request[5:key_http].split(' ')[0]
+
             index = url_complete.find("?")
             if index != -1:
                 r.set_url(url_complete[:index])
@@ -401,11 +422,38 @@ class SimpleHttp:
             return r
         else:
             raise AttributeError("Unknown request:"+str(request))
+
+    def add_web_page_url(self, url, cb):
+        for page in self.web_page_urls:
+            if page.url == url:
+                page.cb = cb
+                return
+        self.web_page_urls.append({"url":url, "cb": cb})
+
+    def handle_web_pages(self):
+        if self.wait == True:
+            return None
+
+        request = self.get_pending_request()
+        if request and request['user_cb']:
+            request['user_cb']()
     
     def get_pending_request(self):
         #Not connected
         if wifi.radio.ipv4_address == None:
             return None
+
+        if self.request:
+            for page in self.web_page_urls:
+                if page['url'] == self.request.get_url():
+                    if self.request.returned:
+                        return None
+                    self.request.set_returned()
+                    return { "request": self.request, "user_cb": page['cb']}
+
+            if self.wait_request_has_been_called == True and time.monotonic() - self.request.get_timestamp() < self.request_timeout:
+                    return None
+               
         try:
             request = self.simple_wifi.receive(protocol="http", block=False)
         except AttributeError:
@@ -413,15 +461,36 @@ class SimpleHttp:
         #print(len(request))
         if len(request) > 0:
             self.request = self.__parse_request(request)
-            return self.request
+            for page in self.web_page_urls:
+                if page['url'] == self.request.get_url():
+                    return { "request": self.request, "user_cb": page['cb']}
+            
         return None
 
     def wait_request(self):
+        self.wait_request_has_been_called = True
         while True:
-            request = self.simple_wifi.receive(protocol="http")
+            if self.request and (not self.request.returned):
+                self.request.set_returned()
+                return self.request
+
+            self.request = None
+            self.wait = True
+            request = self.simple_wifi.receive(protocol="http", timeout=5000)
+            
             #print(len(request))
             if len(request) > 0:
                 self.request = self.__parse_request(request)
+                found_web_page = False
+                for page in self.web_page_urls:
+                    if page['url'] == self.request.get_url():
+                        page['cb']()
+                        found_web_page = True
+                        break
+                self.wait = False
+                if found_web_page:
+                    continue
+                self.request.set_returned()
                 return self.request
 
     def respond_with_html(self, response, code=200, template="template.html", tags=None):
@@ -438,15 +507,19 @@ class SimpleHttp:
         for tag, value in tags:
             r.replace(tag, str(value))
 
-        return self.simple_wifi.send_to_client(str(r))
+        r = self.simple_wifi.send_to_client(str(r))
+        self.request = None
+        return r
 
     def respond(self, response, code=200):
         r = SimpleHttpResponse(code, response)
         r.content_type = "text/plain"
         r.set_text(response)
-        
-        return self.simple_wifi.send_to_client(str(r))
+
+        r = self.simple_wifi.send_to_client(str(r))
+        self.request = None
+        return r
 
 
 def version():
-    return "1.0.7"
+    return "1.0.9"

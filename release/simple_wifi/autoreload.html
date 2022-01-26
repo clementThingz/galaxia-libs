@@ -1,0 +1,39 @@
+<!doctype html>
+
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+
+  <title>Galaxia</title>
+  <meta name="description" content="Galaxia web interface">
+</head>
+
+<style type="text/css">
+
+button{
+    font-size: xx-large;
+    display: block;
+    width: 50%;
+    /* height: 100px; */
+    margin: auto;
+}
+@media only screen and (min-width : 1224px){
+/* Styles pour cette Media Queries */
+
+    button{
+        display: block;
+        margin: auto;
+        width: 10%;
+    }
+}
+</style>
+
+<body style="font-size: xx-large; font-weight: bold;">
+    {response}
+    <script type="text/javascript">
+        setTimeout(function(){
+            location.reload()
+        }, {reload})
+    </script>
+</body>
+</html>

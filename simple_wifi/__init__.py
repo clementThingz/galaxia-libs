@@ -182,6 +182,12 @@ class SimpleWifi:
     def get_last_connected_ip(self):
         return self.last_ip
 
+    def scan(self):
+        networks = []
+        for network in wifi.radio.start_scanning_networks():
+            networks.append(network)
+        return networks
+
     def connect(self, ssid, pwd, static_ip=None, server_port=2000):
         ip = None
         while not ip:
@@ -522,4 +528,4 @@ class SimpleHttp:
 
 
 def version():
-    return "1.0.9"
+    return "1.0.10"

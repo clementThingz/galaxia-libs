@@ -43,9 +43,6 @@ msgid "Returns"
 msgstr "Renvoie"
 
 #: 733fda8f42bc43f197d6d9e2b9b372e4 of simple_wifi.SimpleWifi.scan:1
-msgid ""
-"An array of Network objects. Each has a ssid attribute and a rssi "
-"attribute"
-msgstr "Un tableau d'objets Network. Chaque objet contient un attribut ssid et un"
-" attribut rssi"
+msgid "An array of Network objects. Each has a ssid attribute and a rssi attribute"
+msgstr "Un tableau d'objets Network. Chaque objet contient un attribut ssid et un attribut rssi"
 

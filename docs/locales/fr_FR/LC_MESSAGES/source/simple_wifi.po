@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Galaxia libs \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-26 10:09+0100\n"
+"POT-Creation-Date: 2022-01-26 11:00+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,35 +18,34 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.9.1\n"
 
-#: ../../source/simple_wifi.rst:2 b295ecf0c82e43098ffd3fbf8fa4d35b
+#: ../../source/simple_wifi.rst:2 f4282b2adaf84aa99323001f7c7304e4
 msgid "simple\\_wifi package"
 msgstr ""
 
-#: ../../source/simple_wifi.rst:5 a65b52118f794f0fa09734baf0706841
+#: ../../source/simple_wifi.rst:5 2bce516465054c67901e201a787da478
 msgid "Module contents"
 msgstr "Contenu du module"
 
-#: 030a80ce46ec48ae8526f47fcc97f06b 29cda5c30fc04d3ebdc2e43d0d150e2d
-#: 80e5b32b7df7410eafb1fe6da1778231 98b428e05c43444a8c2b6c40fbdbba9f
-#: 9c192816253a40f6ab3e4c7ad15602fd of simple_wifi.SimpleHttp:1
+#: 544fac40fc9642df84a782e347e67ec5 8e915c11503e4f4e824c9309cab0ad61
+#: a97d83a3657e4ecaa77a3031ffaec9bd bebf3ddf195548fb8ec30ee7cf30b63f
+#: dae41bb57a334c60b6234ea06785e10f of simple_wifi.SimpleHttp:1
 #: simple_wifi.SimpleHttpRequest:1 simple_wifi.SimpleHttpResponse:1
 #: simple_wifi.SimpleTcp:1 simple_wifi.SimpleWifi:1
 msgid "Bases: :class:`object`"
 msgstr ""
 
-#: b966924d81b2468cb1ac8650f143a464 of simple_wifi.SimpleWifi:1
+#: 743a6f134b3d42809c03829b0f080fc5 of simple_wifi.SimpleWifi:1
 msgid "SimpleWfi"
 msgstr ""
 
-#: c754e9f6c3cb48c3b698384384a85a35 of simple_wifi.SimpleWifi.scan
+#: 92cfcf89c6834a1dbacb3cadb9d19919 of simple_wifi.SimpleWifi.scan
 msgid "Returns"
-msgstr "Retourne"
+msgstr "Renvoie"
 
-#: 0783ec32dfe94e529a51c0a599f6e814 of simple_wifi.SimpleWifi.scan:1
+#: 733fda8f42bc43f197d6d9e2b9b372e4 of simple_wifi.SimpleWifi.scan:1
 msgid ""
 "An array of Network objects. Each has a ssid attribute and a rssi "
 "attribute"
-msgstr ""
-"Un tableau d'objets Network. Chaque objet contient un attribut ssid et un"
+msgstr "Un tableau d'objets Network. Chaque objet contient un attribut ssid et un"
 " attribut rssi"
 

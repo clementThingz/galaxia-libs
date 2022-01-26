@@ -185,7 +185,7 @@ class SimpleWifi:
 
     def scan(self):
         """
-        :return: An array of Network objects. Each have a ssid and a rssi attributes
+        :return: An array of Network objects. Each has a ssid and a rssi attributes
         """
         networks = []
         for network in wifi.radio.start_scanning_networks():

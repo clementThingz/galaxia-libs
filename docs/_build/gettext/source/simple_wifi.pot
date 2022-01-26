@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Galaxia libs \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-26 09:50+0100\n"
+"POT-Creation-Date: 2022-01-26 10:09+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -51,5 +51,5 @@ msgstr ""
 
 #: ../../../simple_wifi/__init__.py:docstring of simple_wifi.SimpleWifi.scan:1
 #: 0783ec32dfe94e529a51c0a599f6e814
-msgid "An array of Network objects. Each have a ssid and a rssi attributes"
+msgid "An array of Network objects. Each has a ssid attribute and a rssi attribute"
 msgstr ""

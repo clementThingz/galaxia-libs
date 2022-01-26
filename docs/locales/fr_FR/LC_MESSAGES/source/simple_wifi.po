@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Galaxia libs \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-12 16:56+0200\n"
+"POT-Creation-Date: 2022-01-26 09:50+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -37,4 +37,12 @@ msgstr ""
 #: b966924d81b2468cb1ac8650f143a464 of simple_wifi.SimpleWifi:1
 msgid "SimpleWfi"
 msgstr ""
+
+#: c754e9f6c3cb48c3b698384384a85a35 of simple_wifi.SimpleWifi.scan
+msgid "Returns"
+msgstr "Retourne"
+
+#: 0783ec32dfe94e529a51c0a599f6e814 of simple_wifi.SimpleWifi.scan:1
+msgid "An array of Network objects. Each have a ssid and a rssi attributes"
+msgstr "Un tableau d'objets Network. Chaque objet contient un attribut ssid et un attribut rssi"
 

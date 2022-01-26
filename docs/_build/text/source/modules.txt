@@ -1,0 +1,6 @@
+galaxia-libs
+************
+
+* simple_wifi package
+
+  * Module contents

@@ -1,0 +1,119 @@
+simple_wifi package
+*******************
+
+
+Module contents
+===============
+
+class simple_wifi.SimpleHttp(simple_wifi)
+
+   Bases: "object"
+
+   add_web_page_url(url, cb)
+
+   get_pending_request()
+
+   handle_web_pages()
+
+   respond(response, code=200)
+
+   respond_with_html(response, code=200, template='template.html', tags=None)
+
+   wait_request()
+
+class simple_wifi.SimpleHttpRequest(method='', url='', params={})
+
+   Bases: "object"
+
+   add_params(key, value)
+
+   get_method()
+
+   get_params()
+
+   get_timestamp()
+
+   get_url()
+
+   set_method(method)
+
+   set_params(params)
+
+   set_returned()
+
+   set_url(url)
+
+class simple_wifi.SimpleHttpResponse(code=200, text='', headers={})
+
+   Bases: "object"
+
+   add_headers(key, value)
+
+   get_code()
+
+   get_headers()
+
+   get_text()
+
+   replace(key, value)
+
+   set_code(code)
+
+   set_headers(headers)
+
+   set_text(text)
+
+class simple_wifi.SimpleTcp
+
+   Bases: "object"
+
+   close()
+
+   close_client()
+
+   connect(ip, port=2000)
+
+   monitor_server()
+
+   receive(timeout=None)
+
+   receive_from_client(timeout=None)
+
+   send(data)
+
+   send_to_client(data)
+
+   start_server(ip=None, port=2000)
+
+   stop_server()
+
+   wait_client(timeout=None, debug=True)
+
+class simple_wifi.SimpleWifi
+
+   Bases: "object"
+
+   SimpleWfi
+
+   connect(ssid, pwd, static_ip=None, server_port=2000)
+
+   get_last_connected_ip()
+
+   get_my_ip()
+
+   get_my_ip_ap()
+
+   receive(protocol=None, ip=None, timeout=None, stopSequence='\r\n', block=True)
+
+   scan()
+
+      :returns An array of Network objects. Each have a ssid and a
+      rssi attributes
+
+   send(data, ip, port=2000)
+
+   send_to_client(data)
+
+   start_access_point(ssid='Thingz-Galaxia', password='', server_port=2000)
+
+simple_wifi.version()

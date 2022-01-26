@@ -182,7 +182,11 @@ class SimpleWifi:
     def get_last_connected_ip(self):
         return self.last_ip
 
+
     def scan(self):
+        """
+        :return: An array of Network objects. Each have a ssid and a rssi attributes
+        """
         networks = []
         for network in wifi.radio.start_scanning_networks():
             networks.append(network)

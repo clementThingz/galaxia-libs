@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Galaxia libs \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-26 11:00+0100\n"
+"POT-Creation-Date: 2022-01-27 16:23+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -38,11 +38,148 @@ msgstr ""
 msgid "SimpleWfi"
 msgstr ""
 
-#: 92cfcf89c6834a1dbacb3cadb9d19919 of simple_wifi.SimpleWifi.scan
-msgid "Returns"
-msgstr "Renvoie"
+#: 7c548b9ec1124863b115c84d4c9cb93f of simple_wifi.SimpleWifi.close:1
+msgid "Close the connection with the current client of the TCP server"
+msgstr "Ferme la connexion du client du serveur TCP"
 
-#: 733fda8f42bc43f197d6d9e2b9b372e4 of simple_wifi.SimpleWifi.scan:1
-msgid "An array of Network objects. Each has a ssid attribute and a rssi attribute"
-msgstr "Un tableau d'objets Network. Chaque objet contient un attribut ssid et un attribut rssi"
+#: 5403ce8fd04148ee8413017ee9bf20d6 of simple_wifi.SimpleWifi.connect:1
+msgid "Connect to an access point"
+msgstr "Connexion à un point d'accès"
+
+#: 04813e574a424c0fa5bd3826580a0ec4 1b2511afbfbf4380acd225c3ad947bcb
+#: 275e715a389e4eeb8afbad65293fcb35 893d2fea05e2452c8ad85acbc7fcd53a
+#: 8cfc21769aac4aa089df1f20f456d8af ef05b25fa8d34d1bb058b7132ede541f
+#: fb0cf1b221e44090bfbe1589216f3c3e of simple_wifi.SimpleWifi.connect
+#: simple_wifi.SimpleWifi.receive simple_wifi.SimpleWifi.receive_http
+#: simple_wifi.SimpleWifi.send simple_wifi.SimpleWifi.send_to_client
+#: simple_wifi.SimpleWifi.send_to_http_client
+#: simple_wifi.SimpleWifi.start_access_point
+msgid "Parameters"
+msgstr ""
+
+#: e5eb9ddf3b494569abee7992e4d7823f of simple_wifi.SimpleWifi.connect:3
+msgid "Access point ssid"
+msgstr "SSID du point d'accès"
+
+#: 49d7c2a82e9049f5a14a4a25d233bdd6 77bff8f7b60c4917815f1f542ac223a4 of
+#: simple_wifi.SimpleWifi.connect:4 simple_wifi.SimpleWifi.start_access_point:4
+msgid "Access point password"
+msgstr "Mot de passe du point d'accès"
+
+#: ec162f0a8556497a8e9e8540c5b245b6 of simple_wifi.SimpleWifi.connect:5
+msgid "The static IP to assign to the Galaxia"
+msgstr "L'IP statique à attribuer à la Galaxia"
+
+#: 1b96043f163b4384ab619e64f849aa5b d32ecacc62cf432a88745ebad3aa064c of
+#: simple_wifi.SimpleWifi.connect:6 simple_wifi.SimpleWifi.start_access_point:5
+msgid "The port used by the TCP server"
+msgstr "Le port utilisé par le serveur TCP"
+
+#: 5522c65a918f45d59b0adf37f9efa2e0 of simple_wifi.SimpleWifi.receive:1
+msgid "Receive data from TCP server"
+msgstr "Recevoir des données d'un client du serveur TCP"
+
+#: 0cf3250af16646a696b20f5a8355d5fb b5eb0892b8a4488686eb54959be00be5 of
+#: simple_wifi.SimpleWifi.receive:3 simple_wifi.SimpleWifi.receive_http:3
+msgid "Filter request by IP. Requests from other IPs than IP will be ignored"
+msgstr "Filtrer les clients par IP. Seulement une connexion de cette adresse IP sera acceptée"
+
+#: 806a8c0873314596ace964efd08f03a6 8aa05f6bfb3e4f20a898c3a4e2300920 of
+#: simple_wifi.SimpleWifi.receive:4 simple_wifi.SimpleWifi.receive_http:4
+msgid "set how long to wait before returning if no data is received"
+msgstr "Choisir combien de secondes attendre si aucune donnée n'est reçue"
+
+#: 658fb69dc0d641d29c8458b88d2213a8 of simple_wifi.SimpleWifi.receive:5
+msgid "set the end of message characters"
+msgstr "Choisir la chaîne de caractères de fin de message"
+
+#: 8e10753295784bb18c9753eb9ad80073 ae9a14ddd73146219af50f4bb04acdc8 of
+#: simple_wifi.SimpleWifi.receive:6 simple_wifi.SimpleWifi.receive_http:5
+msgid "wait until something is received"
+msgstr "Bloquer tant que rien n'est reçu"
+
+#: 6599614d695f46519efd4bbc4223cd16 of simple_wifi.SimpleWifi.receive:7
+msgid ""
+"If a client is already connected, keep the connection and try to receive "
+"from this client again"
+msgstr "Si un client est déjà connecté, garder sa connexion et essayer de recevoir de nouvelles données"
+
+#: 63565d89f97b40b19d5cb0e98bd56613 def1893b7a5f4c4cb2a4e8d0c685eeb0
+#: f8b40b239fa34e47b1e8b382486ffe63 of simple_wifi.SimpleWifi.receive
+#: simple_wifi.SimpleWifi.receive_http simple_wifi.SimpleWifi.scan
+msgid "Returns"
+msgstr ""
+
+#: a307cb3bb461493586e1400ee4ac1f38 of simple_wifi.SimpleWifi.receive:8
+msgid "A string containing the message"
+msgstr "Le message reçu sous forme de string"
+
+#: 2f875b0cde0545d9829404fc80872c42 of simple_wifi.SimpleWifi.receive_http:1
+msgid "Receive an HTTP request from the HTTP server"
+msgstr "Recevoir une requête HTTP depuis le serveur HTTP"
+
+#: 747e3beae8744a6a8caebef418dad83c of simple_wifi.SimpleWifi.receive_http:6
+msgid "The HTTP request"
+msgstr "La requête HTTP"
+
+#: 4c2bb8f1726748e297f05d13a39b977c of simple_wifi.SimpleWifi.receive_http
+msgid "Return type"
+msgstr ""
+
+#: ea71b979777645e98ab675ae5f018790 of simple_wifi.SimpleWifi.receive_http:7
+msgid ":class:`simple_wifi.SimpleHttpRequest`"
+msgstr ""
+
+#: 9f145adc31d64ebe9eb175462418217c of simple_wifi.SimpleWifi.scan:1
+msgid "Scan wifi nearby wifi networks"
+msgstr "Scanner les réseaux Wifi"
+
+#: 733fda8f42bc43f197d6d9e2b9b372e4 of simple_wifi.SimpleWifi.scan:3
+msgid ""
+"An array of Network objects. Each has a ssid attribute and a rssi "
+"attribute"
+msgstr ""
+"Un tableau d'objets Network. Chaque objet contient un attribut ssid et un"
+" attribut rssi"
+
+#: b521792ad0ab4b2c8e65dfef7530ecc3 of simple_wifi.SimpleWifi.send:1
+msgid "Connect to IP and send data"
+msgstr "Se connecter à une ip et envoyer un message"
+
+#: a349bf196c4c49b6a24183e0f30724e5 of simple_wifi.SimpleWifi.send:3
+msgid "the data to be send"
+msgstr "Le message à envoyer"
+
+#: 07c76b3dc5e640259cd1311952df2c61 of simple_wifi.SimpleWifi.send:5
+msgid "The IP address to connect to"
+msgstr "L'addresse IP sur laquelle se connecter"
+
+#: faab0d8082324ac1a9d78e5f5292a3b0 of simple_wifi.SimpleWifi.send:6
+msgid "The port to connect to"
+msgstr "Le port sur lequel se connecter"
+
+#: af62e12269c4491b9599f7d89e65d1b2 of simple_wifi.SimpleWifi.send_to_client:1
+msgid "Respond to a client of the TCP server"
+msgstr "Répondre à un message du client du serveur TCP"
+
+#: 07b914c21e104dca8a3f58ec47ba6ae1 1f9165b353bf40de95479db8ea27aa2b of
+#: simple_wifi.SimpleWifi.send_to_client:3
+#: simple_wifi.SimpleWifi.send_to_http_client:3
+msgid "the response"
+msgstr "La réponse"
+
+#: c1eef22dffca41739a03470cc36351e6 of
+#: simple_wifi.SimpleWifi.send_to_http_client:1
+msgid "Respond to client of the HTTP server"
+msgstr "Répondre à la requête HTTP du serveur HTTP"
+
+#: a9fd894b90ba4b16955af8bdb482b2f0 of
+#: simple_wifi.SimpleWifi.start_access_point:1
+msgid "Start an access point on the Galaxia"
+msgstr "Lancer un point d'accès sur la Galaxia"
+
+#: adfeeb04056e4ad491edc384abeb30ce of
+#: simple_wifi.SimpleWifi.start_access_point:3
+msgid "Access point name"
+msgstr "Le nom du point d'accès"
 

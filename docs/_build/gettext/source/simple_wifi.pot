@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Galaxia libs \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-26 11:00+0100\n"
+"POT-Creation-Date: 2022-01-27 16:23+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -44,12 +44,180 @@ msgstr ""
 msgid "SimpleWfi"
 msgstr ""
 
+#: ../../../simple_wifi/__init__.py:docstring of simple_wifi.SimpleWifi.close:1
+#: 7c548b9ec1124863b115c84d4c9cb93f
+msgid "Close the connection with the current client of the TCP server"
+msgstr ""
+
+#: ../../../simple_wifi/__init__.py:docstring of simple_wifi.SimpleWifi.connect:1
+#: 5403ce8fd04148ee8413017ee9bf20d6
+msgid "Connect to an access point"
+msgstr ""
+
+#: ../../../simple_wifi/__init__.py:docstring of simple_wifi.SimpleWifi.connect:0
+#: ../../../simple_wifi/__init__.py:docstring of simple_wifi.SimpleWifi.receive:0
+#: ../../../simple_wifi/__init__.py:docstring of simple_wifi.SimpleWifi.receive_http:0
+#: ../../../simple_wifi/__init__.py:docstring of simple_wifi.SimpleWifi.send:0
+#: ../../../simple_wifi/__init__.py:docstring of simple_wifi.SimpleWifi.send_to_client:0
+#: ../../../simple_wifi/__init__.py:docstring of simple_wifi.SimpleWifi.send_to_http_client:0
+#: ../../../simple_wifi/__init__.py:docstring of simple_wifi.SimpleWifi.start_access_point:0
+#: 893d2fea05e2452c8ad85acbc7fcd53a
+#: 8cfc21769aac4aa089df1f20f456d8af
+#: 275e715a389e4eeb8afbad65293fcb35
+#: fb0cf1b221e44090bfbe1589216f3c3e
+#: 1b2511afbfbf4380acd225c3ad947bcb
+#: ef05b25fa8d34d1bb058b7132ede541f
+#: 04813e574a424c0fa5bd3826580a0ec4
+msgid "Parameters"
+msgstr ""
+
+#: ../../../simple_wifi/__init__.py:docstring of simple_wifi.SimpleWifi.connect:3
+#: e5eb9ddf3b494569abee7992e4d7823f
+msgid "Access point ssid"
+msgstr ""
+
+#: ../../../simple_wifi/__init__.py:docstring of simple_wifi.SimpleWifi.connect:4
+#: ../../../simple_wifi/__init__.py:docstring of simple_wifi.SimpleWifi.start_access_point:4
+#: 77bff8f7b60c4917815f1f542ac223a4
+#: 49d7c2a82e9049f5a14a4a25d233bdd6
+msgid "Access point password"
+msgstr ""
+
+#: ../../../simple_wifi/__init__.py:docstring of simple_wifi.SimpleWifi.connect:5
+#: ec162f0a8556497a8e9e8540c5b245b6
+msgid "The static IP to assign to the Galaxia"
+msgstr ""
+
+#: ../../../simple_wifi/__init__.py:docstring of simple_wifi.SimpleWifi.connect:6
+#: ../../../simple_wifi/__init__.py:docstring of simple_wifi.SimpleWifi.start_access_point:5
+#: 1b96043f163b4384ab619e64f849aa5b
+#: d32ecacc62cf432a88745ebad3aa064c
+msgid "The port used by the TCP server"
+msgstr ""
+
+#: ../../../simple_wifi/__init__.py:docstring of simple_wifi.SimpleWifi.receive:1
+#: 5522c65a918f45d59b0adf37f9efa2e0
+msgid "Receive data from TCP server"
+msgstr ""
+
+#: ../../../simple_wifi/__init__.py:docstring of simple_wifi.SimpleWifi.receive:3
+#: ../../../simple_wifi/__init__.py:docstring of simple_wifi.SimpleWifi.receive_http:3
+#: b5eb0892b8a4488686eb54959be00be5
+#: 0cf3250af16646a696b20f5a8355d5fb
+msgid "Filter request by IP. Requests from other IPs than IP will be ignored"
+msgstr ""
+
+#: ../../../simple_wifi/__init__.py:docstring of simple_wifi.SimpleWifi.receive:4
+#: ../../../simple_wifi/__init__.py:docstring of simple_wifi.SimpleWifi.receive_http:4
+#: 8aa05f6bfb3e4f20a898c3a4e2300920
+#: 806a8c0873314596ace964efd08f03a6
+msgid "set how long to wait before returning if no data is received"
+msgstr ""
+
+#: ../../../simple_wifi/__init__.py:docstring of simple_wifi.SimpleWifi.receive:5
+#: 658fb69dc0d641d29c8458b88d2213a8
+msgid "set the end of message characters"
+msgstr ""
+
+#: ../../../simple_wifi/__init__.py:docstring of simple_wifi.SimpleWifi.receive:6
+#: ../../../simple_wifi/__init__.py:docstring of simple_wifi.SimpleWifi.receive_http:5
+#: ae9a14ddd73146219af50f4bb04acdc8
+#: 8e10753295784bb18c9753eb9ad80073
+msgid "wait until something is received"
+msgstr ""
+
+#: ../../../simple_wifi/__init__.py:docstring of simple_wifi.SimpleWifi.receive:7
+#: 6599614d695f46519efd4bbc4223cd16
+msgid "If a client is already connected, keep the connection and try to receive from this client again"
+msgstr ""
+
+#: ../../../simple_wifi/__init__.py:docstring of simple_wifi.SimpleWifi.receive:0
+#: ../../../simple_wifi/__init__.py:docstring of simple_wifi.SimpleWifi.receive_http:0
 #: ../../../simple_wifi/__init__.py:docstring of simple_wifi.SimpleWifi.scan:0
-#: 92cfcf89c6834a1dbacb3cadb9d19919
+#: def1893b7a5f4c4cb2a4e8d0c685eeb0
+#: f8b40b239fa34e47b1e8b382486ffe63
+#: 63565d89f97b40b19d5cb0e98bd56613
 msgid "Returns"
 msgstr ""
 
+#: ../../../simple_wifi/__init__.py:docstring of simple_wifi.SimpleWifi.receive:8
+#: a307cb3bb461493586e1400ee4ac1f38
+msgid "A string containing the message"
+msgstr ""
+
+#: ../../../simple_wifi/__init__.py:docstring of simple_wifi.SimpleWifi.receive_http:1
+#: 2f875b0cde0545d9829404fc80872c42
+msgid "Receive an HTTP request from the HTTP server"
+msgstr ""
+
+#: ../../../simple_wifi/__init__.py:docstring of simple_wifi.SimpleWifi.receive_http:6
+#: 747e3beae8744a6a8caebef418dad83c
+msgid "The HTTP request"
+msgstr ""
+
+#: ../../../simple_wifi/__init__.py:docstring of simple_wifi.SimpleWifi.receive_http:0
+#: 4c2bb8f1726748e297f05d13a39b977c
+msgid "Return type"
+msgstr ""
+
+#: ../../../simple_wifi/__init__.py:docstring of simple_wifi.SimpleWifi.receive_http:7
+#: ea71b979777645e98ab675ae5f018790
+msgid ":class:`simple_wifi.SimpleHttpRequest`"
+msgstr ""
+
 #: ../../../simple_wifi/__init__.py:docstring of simple_wifi.SimpleWifi.scan:1
+#: 9f145adc31d64ebe9eb175462418217c
+msgid "Scan wifi nearby wifi networks"
+msgstr ""
+
+#: ../../../simple_wifi/__init__.py:docstring of simple_wifi.SimpleWifi.scan:3
 #: 733fda8f42bc43f197d6d9e2b9b372e4
 msgid "An array of Network objects. Each has a ssid attribute and a rssi attribute"
+msgstr ""
+
+#: ../../../simple_wifi/__init__.py:docstring of simple_wifi.SimpleWifi.send:1
+#: b521792ad0ab4b2c8e65dfef7530ecc3
+msgid "Connect to IP and send data"
+msgstr ""
+
+#: ../../../simple_wifi/__init__.py:docstring of simple_wifi.SimpleWifi.send:3
+#: a349bf196c4c49b6a24183e0f30724e5
+msgid "the data to be send"
+msgstr ""
+
+#: ../../../simple_wifi/__init__.py:docstring of simple_wifi.SimpleWifi.send:5
+#: 07c76b3dc5e640259cd1311952df2c61
+msgid "The IP address to connect to"
+msgstr ""
+
+#: ../../../simple_wifi/__init__.py:docstring of simple_wifi.SimpleWifi.send:6
+#: faab0d8082324ac1a9d78e5f5292a3b0
+msgid "The port to connect to"
+msgstr ""
+
+#: ../../../simple_wifi/__init__.py:docstring of simple_wifi.SimpleWifi.send_to_client:1
+#: af62e12269c4491b9599f7d89e65d1b2
+msgid "Respond to a client of the TCP server"
+msgstr ""
+
+#: ../../../simple_wifi/__init__.py:docstring of simple_wifi.SimpleWifi.send_to_client:3
+#: ../../../simple_wifi/__init__.py:docstring of simple_wifi.SimpleWifi.send_to_http_client:3
+#: 07b914c21e104dca8a3f58ec47ba6ae1
+#: 1f9165b353bf40de95479db8ea27aa2b
+msgid "the response"
+msgstr ""
+
+#: ../../../simple_wifi/__init__.py:docstring of simple_wifi.SimpleWifi.send_to_http_client:1
+#: c1eef22dffca41739a03470cc36351e6
+msgid "Respond to client of the HTTP server"
+msgstr ""
+
+#: ../../../simple_wifi/__init__.py:docstring of simple_wifi.SimpleWifi.start_access_point:1
+#: a9fd894b90ba4b16955af8bdb482b2f0
+msgid "Start an access point on the Galaxia"
+msgstr ""
+
+#: ../../../simple_wifi/__init__.py:docstring of simple_wifi.SimpleWifi.start_access_point:3
+#: adfeeb04056e4ad491edc384abeb30ce
+msgid "Access point name"
 msgstr ""

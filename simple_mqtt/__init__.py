@@ -28,11 +28,13 @@ class SimpleMQTT:
             if self.mutex:
                 return
             self.mutex = True
-            self.client.loop()
+            if self.client.is_connected():
+                self.client.loop()
             self.mutex = False
         except Exception as e:
             self.mutex = False
-            print(e)
+            if not  str(e).startswith("MiniMQTT is not connected"):
+                print(e)
 
     def connect(self):
         self.client.connect()
@@ -70,4 +72,4 @@ class SimpleMQTT:
 
 
 def version():
-    return "1.0.0"
+    return "1.0.1"

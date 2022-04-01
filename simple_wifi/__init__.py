@@ -285,7 +285,7 @@ class SimpleWifi:
             return False
         return True
 
-    def receive(self, ip=None, timeout=None, stopSequence="\r\n", block=True, reuseClient=False):
+    def receive(self, ip=None, timeout=None, stopSequence="\r", block=True, reuseClient=False):
         """
         Receive data from TCP server
 
@@ -637,4 +637,4 @@ class SimpleHttp:
 
 
 def version():
-    return "1.0.11"
+    return "1.0.9"

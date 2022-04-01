@@ -285,7 +285,7 @@ class SimpleWifi:
             return False
         return True
 
-    def receive(self, ip=None, timeout=None, stopSequence="\r", block=True, reuseClient=False):
+    def receive(self, ip=None, timeout=None, stopSequence="\r", block=True, reuseClient=False, verbose=False):
         """
         Receive data from TCP server
 
@@ -331,18 +331,20 @@ class SimpleWifi:
                             data.append(b)
                     else:  
                         self.simple_tcp.close_client()
-                        print("Message de "+str(self.last_ip))
+                        if verbose:
+                            print("Message de "+str(self.last_ip))
                         return data.decode("utf-8")
 
                     request = data.decode("utf8-8")
                     
                     if request.endswith(stopSequence):
-                        print("Message de "+str(self.last_ip))
+                        if verbose:
+                            print("Message de "+str(self.last_ip))
                         return request[:request.find(stopSequence)]
             else:
                 self.simple_tcp.close_client()
 
-    def receive_http(self, ip=None, timeout=None, block=True):
+    def receive_http(self, ip=None, timeout=None, block=True, verbose=False):
         """
         Receive an HTTP request from the HTTP server
 
@@ -379,13 +381,15 @@ class SimpleWifi:
                             data.append(b)
                     else:  
                         self.simple_tcp_http.close_client()
-                        print("Message de "+str(self.last_ip))
+                        if verbose:
+                            print("Message de "+str(self.last_ip))
                         return data.decode("utf-8")
 
                     request = data.decode("utf8-8")
                     
                     if request.endswith("\r\n\r\n"):
-                        print("Message de "+str(self.last_ip))
+                        if verbose:
+                            print("Message de "+str(self.last_ip))
                         return request
 
             else:
@@ -637,4 +641,4 @@ class SimpleHttp:
 
 
 def version():
-    return "1.0.9"
+    return "1.0.10"

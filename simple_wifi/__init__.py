@@ -188,6 +188,8 @@ class SimpleWifi:
     def get_last_connected_ip(self):
         return self.last_ip
 
+    def is_client_connected(self):
+        return self.simple_tcp.has_client()
 
     def scan(self):
         """
@@ -402,7 +404,11 @@ class SimpleWifi:
         :param data: the response
         """
         b = bytes(str(data), "utf-8")
-        return self.simple_tcp.send_to_client(b)
+        try:
+            return self.simple_tcp.send_to_client(b)
+        except OSError:
+            self.simple_tcp.close_client()
+            return False
     
     def send_to_http_client(self, data):
         """
@@ -641,4 +647,4 @@ class SimpleHttp:
 
 
 def version():
-    return "1.0.10"
+    return "1.0.11"

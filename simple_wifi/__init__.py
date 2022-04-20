@@ -332,7 +332,7 @@ class SimpleWifi:
                         for b in d:
                             data.append(b)
                     else:  
-                        self.simple_tcp.close_client()
+                        #self.simple_tcp.close_client()
                         if verbose:
                             print("Message de "+str(self.last_ip))
                         return data.decode("utf-8")
@@ -647,4 +647,4 @@ class SimpleHttp:
 
 
 def version():
-    return "1.0.11"
+    return "1.0.12"

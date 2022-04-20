@@ -61,6 +61,9 @@ class SimpleMQTT:
         except MQTT.MMQTTException:
             self.mutex = False
 
+    def is_connected(self):
+        return self.client.is_connected()
+
     def on_connect(self):
         self.user_on_connect()
 
@@ -72,4 +75,4 @@ class SimpleMQTT:
 
 
 def version():
-    return "1.0.1"
+    return "1.0.2"

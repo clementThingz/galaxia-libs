@@ -10,30 +10,210 @@
 
 <style type="text/css">
 
+
+::-webkit-meter-even-less-good-value {
+    background-color: #fb8332;
+}
+
+::-webkit-meter-optimum-value {
+    background-color: #fb8332;
+}
+
+::-webkit-meter-suboptimum-value {
+    background-color: #fb8332;
+}
+
+::-moz-meter-even-less-good-value {
+    background-color: #fb8332;
+}
+
+::-moz-meter-optimum-value {
+    background-color: #fb8332;
+}
+
+::-moz-meter-suboptimum-value {
+    background-color: #fb8332;
+}
+
+/* 
 button{
     font-size: xx-large;
     display: block;
-    width: 50%;
-    /* height: 100px; */
+    width: 80%;
     margin: auto;
+} */
+
+body{
+    /* text-align: center; */
+    font-family: system-ui,-apple-system,system-ui,"Helvetica Neue",Helvetica,Arial,sans-serif;
 }
-@media only screen and (min-width : 1224px){
+/* CSS */
+.tgz_button {
+  align-items: center;
+  background-clip: padding-box;
+  background-color: #fa6400;
+  border: 1px solid transparent;
+  border-radius: .25rem;
+  box-shadow: rgba(0, 0, 0, 0.02) 0 1px 3px 0;
+  box-sizing: border-box;
+  color: #fff;
+  cursor: pointer;
+  display: inline-flex;
+  font-family: system-ui,-apple-system,system-ui,"Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-weight: 600;
+  justify-content: center;
+  line-height: 1.25;
+  margin: 0;
+  min-height: 3rem;
+  padding: calc(.875rem - 1px) calc(1.5rem - 1px);
+  position: relative;
+  text-decoration: none;
+  transition: all 250ms;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  vertical-align: baseline;
+  /* width: auto; */
+}
+
+.tgz_button:hover,
+.tgz_button:focus {
+  background-color: #fb8332;
+  box-shadow: rgba(0, 0, 0, 0.1) 0 4px 12px;
+}
+
+.tgz_button:hover {
+  transform: translateY(-1px);
+}
+
+.tgz_button:active {
+  background-color: #c75000;
+  box-shadow: rgba(0, 0, 0, .06) 0 2px 4px;
+  transform: translateY(0);
+}
+
+.tgz_button:disabled {
+  background-color: #6d6d6d;
+  box-shadow: rgba(0, 0, 0, .06) 0 2px 4px;
+  transform: translateY(0);
+}
+
+
+@media only screen and (min-width : 1000px){
 /* Styles pour cette Media Queries */
 
+    body{
+        text-align: initial;
+        font-size: large;
+    }
     button{
         display: block;
-        margin: auto;
-        width: 10%;
+        margin: 0;
+        width: 7%;
+        font-size: medium;
     }
 }
 </style>
 
 <body style="font-size: xx-large; font-weight: bold;">
-    {response}
+    <div id=loader>
+    <div id=main>
+        {response}
+    </div #main>
+    </div>
+    <div id="tmp" style="visibility:hidden"></div>
     <script type="text/javascript">
-        setTimeout(function(){
-            location.reload()
-        }, {reload})
+        
+        var autoreload=true;
+        var time = null;
+        function loading(state, button){
+            if(state){
+                button.disabled = true
+            }else{
+                button.disabled = false
+            }
+        }
+        function cmd(cmd, button){
+            console.log(button)
+            autoreload=false;
+            clearTimeout(time)
+            loading(true, button);
+            fetch(cmd).then(function(){
+                autoreload=true;
+                // loading(false);
+                reload(button)
+            })
+            .catch(function(){
+                autoreload=true;
+                // loading(false);
+                reload(button)
+            })
+        }
+        function reload(button){
+            time = null
+        	if(autoreload){
+                fetch(location.pathname)
+                .then(function(response){
+                    response.text().then(function(text){
+                        if(!autoreload)
+                            return
+
+                        let div = text.match(/<div id=main>([\s\S]*?)<\/div #main>/)
+                        //console.log(div)
+                        if(div[1]){
+                            let main = div[1];
+                            let currentMain = document.getElementById("main")
+                            let tmp = document.getElementById("tmp")
+                            tmp.innerHTML = main
+
+                            for(let i = 0; i < tmp.children.length; i++){
+                                if(!tmp.children[i].isEqualNode(currentMain.children[i])){
+                                    if(currentMain.children[i])
+                                        currentMain.children[i].innerHTML = tmp.children[i].innerHTML;
+                                    else{
+                                        let clone = tmp.children[i].cloneNode(true)
+                                        currentMain.appendChild(clone)
+                                    }
+                                }
+                            }
+
+                            for(let i = tmp.children.length; i < currentMain.children.length; i++){
+                                currentMain.children[i].remove();
+                            }
+                        }
+                        if(button){
+                            loading(false, button);
+                        }
+                        if(autoreload){
+                            update()
+                        }
+                    })
+                    .catch(function(){
+                        if(button){
+                            loading(false, button);
+                        }
+                        if(autoreload){
+                            update()
+                        }
+                    })
+                })
+                .catch(function(){
+                    if(button){
+                        loading(false, button);
+                    }
+                    if(autoreload){
+                        update()
+                    }
+                })
+            }
+        }
+
+        function update(){
+            if(time)
+                return;
+            time = setTimeout(reload, 300);
+        }
+        update()
     </script>
 </body>
 </html>

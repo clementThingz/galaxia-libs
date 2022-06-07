@@ -94,6 +94,7 @@ class SimpleTcp:
             
             if timeout:
                 self.current_client[0].setblocking(True)
+                raise Exception("Timeout")
             else:
                 print(e)
             return bytearray()
@@ -111,8 +112,11 @@ class SimpleTcp:
             raise TypeError('data must be of type bytes or bytearray, found '+str(type(data)))
         sent = 0
         while sent < len(data):
-            s = self.current_client[0].send(data[sent:])
-            sent += s
+            try:
+                s = self.current_client[0].send(data[sent:])
+                sent += s
+            except:
+                return
     
     def close_client(self):
         if self.current_client:
@@ -323,16 +327,21 @@ class SimpleWifi:
                         force_timeout = 1 #if reception started force timeout
                     
                     d = ""
+                    timeout_triggered = False
                     try:
                         d = self.simple_tcp.receive_from_client(force_timeout)
-                    except Exception:
+                    except Exception as e:
+                        #print(e)
+                        if str(e) == "Timeout":
+                            timeout_triggered = True
                         d = ""
 
                     if len(d) > 0:
                         for b in d:
                             data.append(b)
-                    else:  
-                        #self.simple_tcp.close_client()
+                    else:
+                        if not timeout_triggered: #socket was closed on the other side
+                            self.simple_tcp.close_client()
                         if verbose:
                             print("Message de "+str(self.last_ip))
                         return data.decode("utf-8")
@@ -369,6 +378,7 @@ class SimpleWifi:
             if ip == None or str(client_ip[0]) == str(ip):
                 data = bytearray()
                 timestamp = time.monotonic()
+                request = ""
                 while (timeout == None or (time.monotonic() - timestamp) < timeout):
                     force_timeout = 0
                     
@@ -379,15 +389,15 @@ class SimpleWifi:
                         d = ""
 
                     if len(d) > 0:
+                        request += d.decode("utf-8")
                         for b in d:
                             data.append(b)
                     else:  
                         self.simple_tcp_http.close_client()
                         if verbose:
                             print("Message de "+str(self.last_ip))
-                        return data.decode("utf-8")
+                        return request
 
-                    request = data.decode("utf8-8")
                     
                     if request.endswith("\r\n\r\n"):
                         if verbose:
@@ -471,10 +481,14 @@ class SimpleHttpResponse:
         self.content_type = "text/html"
     
     def __str__(self):
+        response = self.get_http_header()
+        response += self.text
+        return response
+
+    def get_http_header(self):
         response = "HTTP/1.1 "+str(self.code)+"\r\n"
         response += "content-type: "+self.content_type+"\r\n"
         response += "\r\n"
-        response += self.text
         return response
 
     def get_code(self):
@@ -508,11 +522,11 @@ class SimpleHttp:
         self.request = None
         #url map to webpage who need to be resolve in background (through a call of handle_web_page/get_pending_request())
         self.web_page_urls = []
+        self.page_elements = {}
         #Lock for wait request
         self.wait = False
         self.wait_request_has_been_called = False
         self.request_timeout = 5
-
 
     def __get_params(self, url):
         d = dict()
@@ -547,10 +561,34 @@ class SimpleHttp:
 
     def add_web_page_url(self, url, cb):
         for page in self.web_page_urls:
-            if page.url == url:
-                page.cb = cb
+            if page["url"] == url:
+                page["cb"] = cb
                 return
         self.web_page_urls.append({"url":url, "cb": cb})
+
+    def add_web_button(self, url, cb):
+        self.page_elements[url] = {"type": "button", "value":False, "cb":cb}
+        self.web_page_urls.append({"url": url, "cb": self.handle_button})
+
+    def handle_button(self):
+        url = self.request.get_url()
+        if url in self.page_elements.keys() and self.page_elements[url]["type"] == "button":
+            self.page_elements[url]["value"] = True
+        
+        if self.page_elements[url]["cb"]:
+            self.page_elements[url]["cb"]()
+            self.page_elements[url]["value"] = False
+
+        self.respond(str(self.page_elements[url]["value"]))
+
+
+    def get_page_element(self, url):
+        if url in self.page_elements.keys():
+            value = self.page_elements[url]["value"] 
+            if value and self.page_elements[url]["type"] == "button":
+                self.page_elements[url]["value"] = False
+            return value
+        return None
 
     def handle_web_pages(self):
         if self.wait == True:
@@ -584,7 +622,9 @@ class SimpleHttp:
         if len(request) > 0:
             self.request = self.__parse_request(request)
             for page in self.web_page_urls:
+                # print(page)
                 if page['url'] == self.request.get_url():
+                    # print("Ok")
                     return { "request": self.request, "user_cb": page['cb']}
             
         return None
@@ -598,6 +638,7 @@ class SimpleHttp:
 
             self.request = None
             self.wait = True
+            
             request = self.simple_wifi.receive_http(timeout=5000)
             
             #print(len(request))
@@ -612,6 +653,7 @@ class SimpleHttp:
                 self.wait = False
                 if found_web_page:
                     continue
+                #print(self.request.get_url())
                 self.request.set_returned()
                 return self.request
 
@@ -621,18 +663,55 @@ class SimpleHttp:
             if self.request:
                 self.request.get_url()
             tags = [('request', self.request.get_url())]
+        tags.append(('response', str(response)))
+
         r = SimpleHttpResponse(code, response)
+       
         path = __file__
         path = path[:path.find("__init__.mpy")]+str(template)
         f = open(path)
-        r.set_text(f.read())
+
+        end = False
+        page = ""
+
+        self.simple_wifi.send_to_http_client(r.get_http_header())
+        tagsFound = {}
+        while not end:
+            tagPartialFound = False
+            content = f.read(512)
+            if content:
+                page += content
+            else:
+                #print("end file")
+                break
+
+            for tag, value in tags:
+                if tag in tagsFound.keys():
+                    continue
+                if page.find("{"+tag+"}") != -1:
+                    page = page.replace("{"+tag+"}", str(value))
+                    tagsFound[tag] = "found"
+                else:
+                    # break
+                    for i in range(len(tag), 0, -1):
+                        if page.endswith(tag[-i:]):
+                            tagPartialFound = True
+                            break
+            if not tagPartialFound:
+                # print("no partial")
+                # print(page)
+                self.simple_wifi.send_to_http_client(page)
+                page = ""
+             
+        #r.set_text(f.read())
+        
         f.close()
 
-        r.replace('response', str(response))
-        for tag, value in tags:
-            r.replace(tag, str(value))
-
-        r = self.simple_wifi.send_to_http_client(str(r))
+        # r.replace('response', str(response))
+        # for tag, value in tags:
+        #     r.replace(tag, str(value))
+        if len(page):
+            r = self.simple_wifi.send_to_http_client(page)
         self.request = None
         return r
 
@@ -647,4 +726,4 @@ class SimpleHttp:
 
 
 def version():
-    return "1.0.12"
+    return "1.0.15"

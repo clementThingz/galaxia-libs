@@ -29,7 +29,7 @@ class SimpleMQTT:
                 return
             self.mutex = True
             if self.client.is_connected():
-                self.client.loop()
+                self.client.loop(timeout=0.1)
             self.mutex = False
         except Exception as e:
             self.mutex = False
@@ -75,4 +75,4 @@ class SimpleMQTT:
 
 
 def version():
-    return "1.0.2"
+    return "1.0.3"

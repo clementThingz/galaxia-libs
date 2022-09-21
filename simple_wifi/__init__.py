@@ -617,7 +617,9 @@ class SimpleHttp:
         try:
             request = self.simple_wifi.receive_http(block=False)
         except AttributeError:
+            self.simple_wifi.close()
             return None
+
         #print(len(request))
         if len(request) > 0:
             self.request = self.__parse_request(request)
@@ -626,7 +628,8 @@ class SimpleHttp:
                 if page['url'] == self.request.get_url():
                     # print("Ok")
                     return { "request": self.request, "user_cb": page['cb']}
-            
+
+        self.simple_wifi.close()
         return None
 
     def wait_request(self):
@@ -726,4 +729,4 @@ class SimpleHttp:
 
 
 def version():
-    return "1.0.15"
+    return "1.0.16"

@@ -135,25 +135,32 @@ body{
         }
         function cmd(cmd, button){
             console.log(button)
+            let controller = new AbortController();
+            let abordTimeout = setTimeout(function(){controller.abort()}, 1500)
             autoreload=false;
             clearTimeout(time)
             loading(true, button);
-            fetch(cmd).then(function(){
+            fetch(cmd, { signal: controller.signal}).then(function(){
+                clearTimeout(abordTimeout)
                 autoreload=true;
                 // loading(false);
                 reload(button)
             })
             .catch(function(){
+                clearTimeout(abordTimeout)
                 autoreload=true;
                 // loading(false);
                 reload(button)
             })
         }
         function reload(button){
+            let controller = new AbortController();
+            let abordTimeout = setTimeout(function(){controller.abort()}, 1500)
             time = null
         	if(autoreload){
-                fetch(location.pathname)
+                fetch(location.pathname, { signal: controller.signal})
                 .then(function(response){
+                    clearTimeout(abordTimeout)
                     response.text().then(function(text){
                         if(!autoreload)
                             return
@@ -198,6 +205,7 @@ body{
                     })
                 })
                 .catch(function(){
+                    clearTimeout(abordTimeout)
                     if(button){
                         loading(false, button);
                     }

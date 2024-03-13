@@ -13,6 +13,8 @@ class rectangle:
 
         self.palette = displayio.Palette(1)
         self.palette[0] = color
+
+        self.dir = 0
         
         tile_grid = displayio.TileGrid(self.bitmap,pixel_shader=self.palette,width=width,height=height, tile_width=1, tile_height=1)
         tile_grid.hidden = hidden
@@ -48,9 +50,27 @@ class rectangle:
     def width(self):
         return self.bitmap.width
 
+    @width.setter
+    def width(self, width):
+        hidden = self.group[0].hidden
+        self.group.remove(self.group[0])
+        self.bitmap = displayio.Bitmap(width, self.bitmap.height, 1)
+        tile_grid = displayio.TileGrid(self.bitmap,pixel_shader=self.palette,width=width,height=self.bitmap.height, tile_width=1, tile_height=1)
+        tile_grid.hidden = hidden
+        self.group.insert(0,tile_grid)
+
     @property
     def height(self):
         return self.bitmap.height
+
+    @height.setter
+    def height(self, height):
+        hidden = self.group[0].hidden
+        self.group.remove(self.group[0])
+        self.bitmap = displayio.Bitmap(self.bitmap.width, height, 1)
+        tile_grid = displayio.TileGrid(self.bitmap,pixel_shader=self.palette,width=self.bitmap.width,height=height, tile_width=1, tile_height=1)
+        tile_grid.hidden = hidden
+        self.group.insert(0,tile_grid)
 
     @property
     def scale(self):
@@ -66,6 +86,78 @@ class rectangle:
     def hidden(self, hidden):
         self.group[0].hidden = hidden
 
+    @property
+    def direction(self):
+        return self.dir
+    @direction.setter
+    def direction(self, direction):
+        self.dir =((direction//45)*45)%360
+
+    def moveBy(self, inc):
+        nx = 1
+        ny = 1
+        if self.direction == 0:
+            ny=0
+            nx=1
+        elif self.direction == 45:
+            ny=1
+            nx=1
+        elif self.direction == 90:
+            ny=1
+            nx=0
+        elif self.direction == 135:
+            ny=1
+            nx=-1
+        elif self.direction == 180:
+            ny= 0
+            nx =-1
+        elif self.direction == 225:
+            ny = -1
+            nx = -1
+        elif self.direction == 270:
+            ny = -1
+            nx = 0
+        elif self.direction == 315:
+            ny = -1
+            nx = 1
+        self.y += ny*inc
+        self.x += nx*inc
+
+    def bounceIfEdge(self):
+        if self.direction == 0:
+            if border_collision("e", self):
+                self.direction += 180
+                return
+        elif self.direction == 45:
+            if border_collision("e", self) or border_collision("s", self):
+                self.direction += 180
+                return
+        elif self.direction == 90:
+            if border_collision("s", self):
+                self.direction += 180
+                return
+        elif self.direction == 135:
+            if border_collision("w", self) or border_collision("s", self):
+                self.direction += 180
+                return
+        elif self.direction == 180:
+            if border_collision("w", self):
+                self.direction += 180
+                return
+        elif self.direction == 225:
+            if border_collision("w", self) or border_collision("n", self):
+                self.direction += 180
+                return
+        elif self.direction == 270:
+            if border_collision("n", self):
+                self.direction += 180
+                return
+        elif self.direction == 315:
+            if border_collision("e", self) or border_collision("n", self):
+                self.direction += 180
+                return
+
+
 
 class image:
     def __init__(self, x=0,y=0, scale=1, path="/thingz.bmp",hidden=False):
@@ -77,6 +169,8 @@ class image:
         tile_grid.hidden = hidden
         self.group = displayio.Group(scale=scale,x=x,y=y)
         self.group.insert(0,tile_grid)
+
+        self.dir = 0
         
         général.append(self.group)
     
@@ -116,6 +210,79 @@ class image:
     def width(self):
         return self.bitmap.width
 
+    @property
+    def direction(self):
+        return self.dir
+    @direction.setter
+    def direction(self, direction):
+        self.dir =((direction//45)*45)%360
+
+    def moveBy(self, inc):
+        nx = 1
+        ny = 1
+        if self.direction == 0:
+            ny=0
+            nx=1
+        elif self.direction == 45:
+            ny=1
+            nx=1
+        elif self.direction == 90:
+            ny=1
+            nx=0
+        elif self.direction == 135:
+            ny=1
+            nx=-1
+        elif self.direction == 180:
+            ny= 0
+            nx =-1
+        elif self.direction == 225:
+            ny = -1
+            nx = -1
+        elif self.direction == 270:
+            ny = -1
+            nx = 0
+        elif self.direction == 315:
+            ny = -1
+            nx = 1
+        
+        self.y += ny*inc
+        self.x += nx*inc
+
+    def bounceIfEdge(self):
+        if self.direction == 0:
+            if border_collision("e", self):
+                self.direction += 180
+                return
+        elif self.direction == 45:
+            if border_collision("e", self) or border_collision("s", self):
+                self.direction += 180
+                return
+        elif self.direction == 90:
+            if border_collision("s", self):
+                self.direction += 180
+                return
+        elif self.direction == 135:
+            if border_collision("w", self) or border_collision("s", self):
+                self.direction += 180
+                return
+        elif self.direction == 180:
+            if border_collision("w", self):
+                self.direction += 180
+                return
+        elif self.direction == 225:
+            if border_collision("w", self) or border_collision("n", self):
+                self.direction += 180
+                return
+        elif self.direction == 270:
+            if border_collision("n", self):
+                self.direction += 180
+                return
+        elif self.direction == 315:
+            if border_collision("e", self) or border_collision("n", self):
+                self.direction += 180
+                return
+
+
 
 class icon:
     def __init__(self, x=0,y=0, scale=1, name="cross",color=0xFFFFFF, hidden=False):
@@ -130,6 +297,8 @@ class icon:
         tile_grid.hidden = hidden
         self.group = displayio.Group(scale=scale,x=x,y=y)
         self.group.insert(0,tile_grid)
+
+        self.dir = 0
         
         général.append(self.group)
     
@@ -176,6 +345,77 @@ class icon:
     def color(self, color):
         self.new_palette[0] = color
 
+    @property
+    def direction(self):
+        return self.dir
+    @direction.setter
+    def direction(self, direction):
+        self.dir =((direction//45)*45)%360
+
+    def moveBy(self, inc):
+        nx = 1
+        ny = 1
+        if self.direction == 0:
+            ny=0
+            nx=1
+        elif self.direction == 45:
+            ny=1
+            nx=1
+        elif self.direction == 90:
+            ny=1
+            nx=0
+        elif self.direction == 135:
+            ny=1
+            nx=-1
+        elif self.direction == 180:
+            ny= 0
+            nx =-1
+        elif self.direction == 225:
+            ny = -1
+            nx = -1
+        elif self.direction == 270:
+            ny = -1
+            nx = 0
+        elif self.direction == 315:
+            ny = -1
+            nx = 1
+        self.y += ny*inc
+        self.x += nx*inc
+
+    def bounceIfEdge(self):
+        if self.direction == 0:
+            if border_collision("e", self):
+                self.direction += 180
+                return
+        elif self.direction == 45:
+            if border_collision("e", self) or border_collision("s", self):
+                self.direction += 180
+                return
+        elif self.direction == 90:
+            if border_collision("s", self):
+                self.direction += 180
+                return
+        elif self.direction == 135:
+            if border_collision("w", self) or border_collision("s", self):
+                self.direction += 180
+                return
+        elif self.direction == 180:
+            if border_collision("w", self):
+                self.direction += 180
+                return
+        elif self.direction == 225:
+            if border_collision("w", self) or border_collision("n", self):
+                self.direction += 180
+                return
+        elif self.direction == 270:
+            if border_collision("n", self):
+                self.direction += 180
+                return
+        elif self.direction == 315:
+            if border_collision("e", self) or border_collision("n", self):
+                self.direction += 180
+                return
+
 
 def collision(a,b):
   
@@ -199,5 +439,5 @@ def border_collision(border,sprite):
     return False
 
 def version():
-    return "1.0.0"
+    return "1.0.2"
 

@@ -219,7 +219,11 @@ body{
         function update(){
             if(time)
                 return;
-            time = setTimeout(reload, 300);
+            try{
+                time = setTimeout(reload, {reload});
+            }catch(e){
+                time = setTimeout(reload, 300);
+            }
         }
         update()
     </script>

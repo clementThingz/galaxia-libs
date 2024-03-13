@@ -140,12 +140,15 @@ class SimpleTcp:
                 deleteSocket = True
             except OSError as e:
                 # print(e)
-                t, value, trace = sys.exc_info()
-                code = value.args[0]
-                if code == 11:
-                    deleteSocket = False
-                elif code != 0 and code != 127:
-                    raise e
+                try:
+                    t, value, trace = sys.exc_info()
+                    code = value.args[0]
+                    if code == 11:
+                        deleteSocket = False
+                    elif code != 0 and code != 127:
+                        raise e
+                except:
+                    pass
         
     def send(self, data):
         if not self.client_socket:
@@ -262,7 +265,7 @@ class SimpleWifi:
         return self.ip_ap
 
     
-    def send(self, data, ip, port=2000):
+    def send(self, data, ip, port=2000, stopSequence="\r", waitResponse=False):
         """
         Connect to IP and send data
 
@@ -274,7 +277,7 @@ class SimpleWifi:
         try:
             self.simple_tcp.connect(ip, port)
             # length = len(data)
-            b = bytes(str(data)+"\r\n", "utf-8")
+            b = bytes(str(data)+stopSequence, "utf-8")
             # b.append(length & 0xff)
             # b.append((length >> 8) & 0xff)
             # b.append((length >> 16) & 0xff)
@@ -284,7 +287,31 @@ class SimpleWifi:
             #     b.append(d)
             
             self.simple_tcp.send(b)
+            data = bytearray()
+            response = None
+            if waitResponse:
+                while True:
+                    if len(data):
+                        timeout = 1
+                    try:    
+                        d = self.simple_tcp.receive()
+                        #print(d)
+                        if len(d) > 0:
+                            for b in d:
+                                data.append(b) 
+                    except:
+                        break
+
+                    response = data.decode("utf8-8")
+                    
+                    if response.endswith(stopSequence):
+                        break
+            
             self.simple_tcp.close()
+            if waitResponse:
+                if not response:
+                    return ""
+                return response[:response.find(stopSequence)]
         except OSError as e:
             print(e)
             self.simple_tcp.close()
@@ -342,9 +369,11 @@ class SimpleWifi:
                     else:
                         if not timeout_triggered: #socket was closed on the other side
                             self.simple_tcp.close_client()
-                        if verbose:
-                            print("Message de "+str(self.last_ip))
-                        return data.decode("utf-8")
+                            break
+                        else:
+                            if verbose:
+                                print("Message de "+str(self.last_ip))
+                            return data.decode("utf-8")
 
                     request = data.decode("utf8-8")
                     
@@ -407,17 +436,19 @@ class SimpleWifi:
             else:
                 self.simple_tcp_http.close_client()
 
-    def send_to_client(self, data):
+    def send_to_client(self, data, stopSequence='\r'):
         """
         Respond to a client of the TCP server
 
         :param data: the response
         """
-        b = bytes(str(data), "utf-8")
+        b = bytes(str(data)+stopSequence, "utf-8")
         try:
             return self.simple_tcp.send_to_client(b)
         except OSError:
             self.simple_tcp.close_client()
+            return False
+        except AttributeError:
             return False
     
     def send_to_http_client(self, data):
@@ -429,11 +460,14 @@ class SimpleWifi:
         b = bytes(str(data), "utf-8")
         return self.simple_tcp_http.send_to_client(b)
 
-    def close(self):
+    def close(self, http=False):
         """
         Close the connection with the current client of the TCP server
         """
-        self.simple_tcp.close_client()
+        if http:
+            self.simple_tcp_http.close_client()
+        else:
+            self.simple_tcp.close_client()
 
 class SimpleHttpRequest:
 
@@ -617,7 +651,7 @@ class SimpleHttp:
         try:
             request = self.simple_wifi.receive_http(block=False)
         except AttributeError:
-            self.simple_wifi.close()
+            self.simple_wifi.close(True)
             return None
 
         #print(len(request))
@@ -629,7 +663,7 @@ class SimpleHttp:
                     # print("Ok")
                     return { "request": self.request, "user_cb": page['cb']}
 
-        self.simple_wifi.close()
+        self.simple_wifi.close(True)
         return None
 
     def wait_request(self):
@@ -729,4 +763,4 @@ class SimpleHttp:
 
 
 def version():
-    return "1.0.16"
+    return "1.0.18"

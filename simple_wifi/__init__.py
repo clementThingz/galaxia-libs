@@ -634,7 +634,7 @@ class SimpleHttp:
     
     def get_pending_request(self):
         #Not connected
-        if wifi.radio.ipv4_address == None:
+        if wifi.radio.ipv4_address == None and wifi.radio.ipv4_address_ap == None:
             return None
 
         if self.request:
@@ -763,4 +763,4 @@ class SimpleHttp:
 
 
 def version():
-    return "1.0.18"
+    return "1.0.19"

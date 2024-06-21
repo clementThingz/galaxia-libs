@@ -4,6 +4,11 @@ import sys
 import time
 import ipaddress
 
+try:
+    import ethernet
+except:
+    pass
+
 _simple_tcp_socket_pool = socketpool.SocketPool(wifi.radio)
 
 """wifi"""
@@ -63,10 +68,10 @@ class SimpleTcp:
         except OSError as e:
             if debug:
                 print(e)
-            t, value, trace = sys.exc_info()
+            #t, value, trace = sys.exc_info()
             #print(value)
-            code = value.args[0]
-            if code == 116 or code == 11: #TIMEOUT == 116
+            #code = value.args[0]
+            if e.errno == 116 or e.errno == 11: #TIMEOUT == 116
                 self.server_socket.setblocking(True)
                 return None
             else:
@@ -241,6 +246,26 @@ class SimpleWifi:
         self.simple_tcp_http.start_server(self.ip, 80)
 
         print("Connecté au point d'accès")
+        print("IP Galaxia :"+str(self.ip))
+        return self.ip
+
+    def connect(self, static_ip=None, server_port=2000):
+        while not ethernet.active():
+            pass
+        
+        ethernet.ifconfig("dhcp")
+        while not ethernet.isconnected():
+            pass
+
+        c = list(ethernet.ifconfig())
+        if static_ip:
+            c[0] = static_ip
+            ethernet.ifconfig(c)
+        c = ethernet.ifconfig()
+        self.ip = c[0]
+        self.simple_tcp.start_server(self.ip, server_port)
+        self.simple_tcp_http.start_server(self.ip, 80)
+        print("Connecté")
         print("IP Galaxia :"+str(self.ip))
         return self.ip
 
@@ -634,8 +659,13 @@ class SimpleHttp:
     
     def get_pending_request(self):
         #Not connected
+
         if wifi.radio.ipv4_address == None and wifi.radio.ipv4_address_ap == None:
-            return None
+            try:
+                if not ethernet.isconnected():
+                    return None
+            except:
+                return None
 
         if self.request:
             for page in self.web_page_urls:
@@ -763,4 +793,4 @@ class SimpleHttp:
 
 
 def version():
-    return "1.0.19"
+    return "1.0.21"

@@ -249,7 +249,7 @@ class SimpleWifi:
         print("IP Galaxia :"+str(self.ip))
         return self.ip
 
-    def connect(self, static_ip=None, server_port=2000):
+    def connect_eth(self, static_ip=None, server_port=2000):
         while not ethernet.active():
             pass
         
@@ -793,4 +793,4 @@ class SimpleHttp:
 
 
 def version():
-    return "1.0.21"
+    return "1.0.22"

@@ -16,7 +16,7 @@ class SimpleMQTT:
             socket_pool=socketpool,
             ssl_context=ssl.create_default_context()
         )
-        self.topics = []
+        self.topics = {}
         self.mutex = False
         self.client.on_connect = lambda client, userdata, flags, rc: self.on_connect()
         self.client.on_disconnect = lambda client, userdata, rc: self.on_disconnect()
@@ -40,11 +40,11 @@ class SimpleMQTT:
         self.client.connect()
         
         for topic in self.topics:
-            self.client.subscribe(topic)
+            self.client.subscribe(self.topics[topic][0])
         
 
-    def subscribe(self, topic):
-        self.topics.append(topic)
+    def subscribe(self, topic, cb=None):
+        self.topics[str(hash(topic))] = [topic, cb]
         try:
             if self.client.is_connected():
                 self.mutex = True
@@ -71,8 +71,12 @@ class SimpleMQTT:
         self.user_on_disconnect()
 
     def on_message(self, client, topic, message):
-        self.user_on_message(topic, message)
+        h = str(hash(topic))
+        if h in self.topics and self.topics[h] != None and self.topics[h][1] != None:
+            self.topics[h][1](message)
+        else:
+            self.user_on_message(topic, message)
 
 
 def version():
-    return "1.0.3"
+    return "1.0.5"

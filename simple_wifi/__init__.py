@@ -253,9 +253,10 @@ class SimpleWifi:
         while not ethernet.active():
             pass
         
-        ethernet.ifconfig("dhcp")
-        while not ethernet.isconnected():
-            pass
+        if static_ip == None:
+            ethernet.ifconfig("dhcp")
+            while not ethernet.isconnected():
+                pass
 
         c = list(ethernet.ifconfig())
         if static_ip:
@@ -793,4 +794,4 @@ class SimpleHttp:
 
 
 def version():
-    return "1.0.22"
+    return "1.0.23"

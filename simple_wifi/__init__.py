@@ -215,7 +215,8 @@ class SimpleWifi:
         wifi.radio.stop_scanning_networks()
         return networks
 
-    def connect(self, ssid, pwd, static_ip=None, server_port=2000):
+
+    def connect(self, ssid, pwd, static_ip=None, server_port=2000, timeout=None, netmask=None, gateway=None):
         """
         Connect to an access point
 
@@ -223,9 +224,16 @@ class SimpleWifi:
         :param pwd: Access point password
         :param static_ip: The static IP to assign to the Galaxia
         :param server_port: The port used by the TCP server
+        :param timeout: Maximum time in seconds to wait for connection (None = no timeout)
         """
         ip = None
+        timestamp = time.monotonic()
+
         while not ip:
+            if timeout and (time.monotonic() - timestamp) >= timeout:
+                print(f"Timeout lors de la connexion WiFi après {timeout}s")
+                return None
+
             try:
                 wifi.radio.connect(ssid, pwd)
                 ip = wifi.radio.ipv4_address
@@ -234,12 +242,18 @@ class SimpleWifi:
                     print("Pas de réseau avec SSID = "+ssid)
                 else:
                     print(e)
+
+                if timeout and (time.monotonic() - timestamp) >= timeout:
+                    print(f"Timeout lors de la connexion WiFi après {timeout}s")
+                    return None
                 pass
 
         
         if static_ip:
             addr = ipaddress.IPv4Address(static_ip)
-            wifi.radio.set_ipv4_address(addr)
+            n = ipaddress.IPv4Address(netmask) if netmask else None
+            g = ipaddress.IPv4Address(gateway) if gateway else None
+            wifi.radio.set_ipv4_address(addr, netmask=n, gateway=g)
 
         self.ip = wifi.radio.ipv4_address
         self.simple_tcp.start_server(self.ip, server_port)
@@ -249,18 +263,60 @@ class SimpleWifi:
         print("IP Galaxia :"+str(self.ip))
         return self.ip
 
-    def connect_eth(self, static_ip=None, server_port=2000):
-        while not ethernet.active():
-            pass
-        
+    def connect_eth(self, static_ip=None, server_port=2000, timeout=None, netmask=None, gateway=None):
+        """
+        Connect via Ethernet
+
+        :param static_ip: The static IP to assign to the Galaxia
+        :param server_port: The port used by the TCP server
+        :param timeout: Maximum time in seconds to wait for connection (None = no timeout)
+        """
+         # Essayer d'activer Ethernet une seule fois
+        eth_status = ethernet.active(True)
+
+        # Si None, l'adaptateur n'existe pas - sortir immédiatement
+        if eth_status is None:
+            print("Eth adapter not found")
+            gc.collect()
+            return None
+
+        timestamp_start = time.time()
+
+        ethernet.ifconfig("dhcp")
+        timestamp = time.time()
+        dhcp_timeout = 2.5 if static_ip else (timeout - (time.time() - timestamp_start) if timeout else None)
+
+        while not ethernet.isconnected():
+            if dhcp_timeout and (time.time() - timestamp) >= dhcp_timeout:
+                break
+
+        if not ethernet.isconnected() and not static_ip:
+            print(f"Timeout lors de la connexion Ethernet après {timeout}s")
+            ethernet.active(False)
+            gc.collect()
+
         ethernet.ifconfig("dhcp")
         timestamp = time.monotonic()
-        while not ethernet.isconnected() and (static_ip == None or (time.monotonic() - timestamp) < 2.5):
+        dhcp_timeout = 2.5 if static_ip else (timeout - (time.monotonic() - timestamp_start) if timeout else None)
+
+        while not ethernet.isconnected():
+            if dhcp_timeout and (time.monotonic() - timestamp) >= dhcp_timeout:
+                break
             pass
+
+        if not ethernet.isconnected() and not static_ip:
+            print(f"Timeout lors de la connexion Ethernet après {timeout}s")
+            ethernet.active(False)  # Désactiver Ethernet avant de sortir
+            gc.collect()
+            return None
 
         c = list(ethernet.ifconfig())
         if static_ip:
             c[0] = static_ip
+            if netmask:
+                c[1] = netmask
+            if gateway:
+                c[2] = gateway
             ethernet.ifconfig(c)
         c = ethernet.ifconfig()
         self.ip = c[0]
@@ -328,7 +384,7 @@ class SimpleWifi:
                     except:
                         break
 
-                    response = data.decode("utf8-8")
+                    response = data.decode("utf-8")
                     
                     if response.endswith(stopSequence):
                         break
@@ -401,7 +457,7 @@ class SimpleWifi:
                                 print("Message de "+str(self.last_ip))
                             return data.decode("utf-8")
 
-                    request = data.decode("utf8-8")
+                    request = data.decode("utf-8")
                     
                     if request.endswith(stopSequence):
                         if verbose:
@@ -794,4 +850,4 @@ class SimpleHttp:
 
 
 def version():
-    return "1.0.24"
+    return "1.0.25"

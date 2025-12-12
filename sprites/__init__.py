@@ -123,39 +123,62 @@ class rectangle:
         self.y += ny*inc
         self.x += nx*inc
 
-    def bounceIfEdge(self):
-        if self.direction == 0:
-            if border_collision("e", self):
-                self.direction += 180
-                return
-        elif self.direction == 45:
-            if border_collision("e", self) or border_collision("s", self):
-                self.direction += 180
-                return
-        elif self.direction == 90:
-            if border_collision("s", self):
-                self.direction += 180
-                return
-        elif self.direction == 135:
-            if border_collision("w", self) or border_collision("s", self):
-                self.direction += 180
-                return
-        elif self.direction == 180:
-            if border_collision("w", self):
-                self.direction += 180
-                return
-        elif self.direction == 225:
-            if border_collision("w", self) or border_collision("n", self):
-                self.direction += 180
-                return
-        elif self.direction == 270:
-            if border_collision("n", self):
-                self.direction += 180
-                return
-        elif self.direction == 315:
-            if border_collision("e", self) or border_collision("n", self):
-                self.direction += 180
-                return
+    def bounceIfEdge(self, borders="nesw"):
+        hit_n = "n" in borders and border_collision("n", self)
+        hit_s = "s" in borders and border_collision("s", self)
+        hit_e = "e" in borders and border_collision("e", self)
+        hit_w = "w" in borders and border_collision("w", self)
+
+        hit_horizontal = hit_n or hit_s
+        hit_vertical = hit_e or hit_w
+
+        if hit_horizontal and hit_vertical:
+            self.direction = (self.direction + 180) % 360
+        elif hit_horizontal:
+            self.direction = (360 - self.direction) % 360
+        elif hit_vertical:
+            self.direction = (180 - self.direction) % 360
+
+        if hit_n:
+            self.y = 0
+        if hit_s:
+            self.y = display.height - self.height * self.scale
+        if hit_w:
+            self.x = 0
+        if hit_e:
+            self.x = display.width - self.width * self.scale
+
+    def bounceIfObject(self, other, borders="nesw"):
+        if not collision(self, other):
+            return False
+
+        self_center_x = self.x + (self.width * self.scale) / 2
+        self_center_y = self.y + (self.height * self.scale) / 2
+        other_center_x = other.x + (other.width * other.scale) / 2
+        other_center_y = other.y + (other.height * other.scale) / 2
+
+        dx = self_center_x - other_center_x
+        dy = self_center_y - other_center_y
+
+        overlap_x = (self.width * self.scale + other.width * other.scale) / 2 - abs(dx)
+        overlap_y = (self.height * self.scale + other.height * other.scale) / 2 - abs(dy)
+
+        if overlap_x < overlap_y:
+            if "e" in borders or "w" in borders:
+                self.direction = (180 - self.direction) % 360
+                if dx > 0:
+                    self.x = other.x + other.width * other.scale
+                else:
+                    self.x = other.x - self.width * self.scale
+        else:
+            if "n" in borders or "s" in borders:
+                self.direction = (360 - self.direction) % 360
+                if dy > 0:
+                    self.y = other.y + other.height * other.scale
+                else:
+                    self.y = other.y - self.height * self.scale
+
+        return True
 
 
 
@@ -248,39 +271,62 @@ class image:
         self.y += ny*inc
         self.x += nx*inc
 
-    def bounceIfEdge(self):
-        if self.direction == 0:
-            if border_collision("e", self):
-                self.direction += 180
-                return
-        elif self.direction == 45:
-            if border_collision("e", self) or border_collision("s", self):
-                self.direction += 180
-                return
-        elif self.direction == 90:
-            if border_collision("s", self):
-                self.direction += 180
-                return
-        elif self.direction == 135:
-            if border_collision("w", self) or border_collision("s", self):
-                self.direction += 180
-                return
-        elif self.direction == 180:
-            if border_collision("w", self):
-                self.direction += 180
-                return
-        elif self.direction == 225:
-            if border_collision("w", self) or border_collision("n", self):
-                self.direction += 180
-                return
-        elif self.direction == 270:
-            if border_collision("n", self):
-                self.direction += 180
-                return
-        elif self.direction == 315:
-            if border_collision("e", self) or border_collision("n", self):
-                self.direction += 180
-                return
+    def bounceIfEdge(self, borders="nesw"):
+        hit_n = "n" in borders and border_collision("n", self)
+        hit_s = "s" in borders and border_collision("s", self)
+        hit_e = "e" in borders and border_collision("e", self)
+        hit_w = "w" in borders and border_collision("w", self)
+
+        hit_horizontal = hit_n or hit_s
+        hit_vertical = hit_e or hit_w
+
+        if hit_horizontal and hit_vertical:
+            self.direction = (self.direction + 180) % 360
+        elif hit_horizontal:
+            self.direction = (360 - self.direction) % 360
+        elif hit_vertical:
+            self.direction = (180 - self.direction) % 360
+
+        if hit_n:
+            self.y = 0
+        if hit_s:
+            self.y = display.height - self.height * self.scale
+        if hit_w:
+            self.x = 0
+        if hit_e:
+            self.x = display.width - self.width * self.scale
+
+    def bounceIfObject(self, other, borders="nesw"):
+        if not collision(self, other):
+            return False
+
+        self_center_x = self.x + (self.width * self.scale) / 2
+        self_center_y = self.y + (self.height * self.scale) / 2
+        other_center_x = other.x + (other.width * other.scale) / 2
+        other_center_y = other.y + (other.height * other.scale) / 2
+
+        dx = self_center_x - other_center_x
+        dy = self_center_y - other_center_y
+
+        overlap_x = (self.width * self.scale + other.width * other.scale) / 2 - abs(dx)
+        overlap_y = (self.height * self.scale + other.height * other.scale) / 2 - abs(dy)
+
+        if overlap_x < overlap_y:
+            if "e" in borders or "w" in borders:
+                self.direction = (180 - self.direction) % 360
+                if dx > 0:
+                    self.x = other.x + other.width * other.scale
+                else:
+                    self.x = other.x - self.width * self.scale
+        else:
+            if "n" in borders or "s" in borders:
+                self.direction = (360 - self.direction) % 360
+                if dy > 0:
+                    self.y = other.y + other.height * other.scale
+                else:
+                    self.y = other.y - self.height * self.scale
+
+        return True
 
 
 
@@ -382,39 +428,62 @@ class icon:
         self.y += ny*inc
         self.x += nx*inc
 
-    def bounceIfEdge(self):
-        if self.direction == 0:
-            if border_collision("e", self):
-                self.direction += 180
-                return
-        elif self.direction == 45:
-            if border_collision("e", self) or border_collision("s", self):
-                self.direction += 180
-                return
-        elif self.direction == 90:
-            if border_collision("s", self):
-                self.direction += 180
-                return
-        elif self.direction == 135:
-            if border_collision("w", self) or border_collision("s", self):
-                self.direction += 180
-                return
-        elif self.direction == 180:
-            if border_collision("w", self):
-                self.direction += 180
-                return
-        elif self.direction == 225:
-            if border_collision("w", self) or border_collision("n", self):
-                self.direction += 180
-                return
-        elif self.direction == 270:
-            if border_collision("n", self):
-                self.direction += 180
-                return
-        elif self.direction == 315:
-            if border_collision("e", self) or border_collision("n", self):
-                self.direction += 180
-                return
+    def bounceIfEdge(self, borders="nesw"):
+        hit_n = "n" in borders and border_collision("n", self)
+        hit_s = "s" in borders and border_collision("s", self)
+        hit_e = "e" in borders and border_collision("e", self)
+        hit_w = "w" in borders and border_collision("w", self)
+
+        hit_horizontal = hit_n or hit_s
+        hit_vertical = hit_e or hit_w
+
+        if hit_horizontal and hit_vertical:
+            self.direction = (self.direction + 180) % 360
+        elif hit_horizontal:
+            self.direction = (360 - self.direction) % 360
+        elif hit_vertical:
+            self.direction = (180 - self.direction) % 360
+
+        if hit_n:
+            self.y = 0
+        if hit_s:
+            self.y = display.height - self.height * self.scale
+        if hit_w:
+            self.x = 0
+        if hit_e:
+            self.x = display.width - self.width * self.scale
+
+    def bounceIfObject(self, other, borders="nesw"):
+        if not collision(self, other):
+            return False
+
+        self_center_x = self.x + (self.width * self.scale) / 2
+        self_center_y = self.y + (self.height * self.scale) / 2
+        other_center_x = other.x + (other.width * other.scale) / 2
+        other_center_y = other.y + (other.height * other.scale) / 2
+
+        dx = self_center_x - other_center_x
+        dy = self_center_y - other_center_y
+
+        overlap_x = (self.width * self.scale + other.width * other.scale) / 2 - abs(dx)
+        overlap_y = (self.height * self.scale + other.height * other.scale) / 2 - abs(dy)
+
+        if overlap_x < overlap_y:
+            if "e" in borders or "w" in borders:
+                self.direction = (180 - self.direction) % 360
+                if dx > 0:
+                    self.x = other.x + other.width * other.scale
+                else:
+                    self.x = other.x - self.width * self.scale
+        else:
+            if "n" in borders or "s" in borders:
+                self.direction = (360 - self.direction) % 360
+                if dy > 0:
+                    self.y = other.y + other.height * other.scale
+                else:
+                    self.y = other.y - self.height * self.scale
+
+        return True
 
 
 def collision(a,b):
@@ -439,5 +508,5 @@ def border_collision(border,sprite):
     return False
 
 def version():
-    return "1.0.2"
+    return "1.0.4"
 

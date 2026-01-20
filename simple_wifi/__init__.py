@@ -231,8 +231,9 @@ class SimpleWifi:
 
         while not ip:
             if timeout and (time.monotonic() - timestamp) >= timeout:
-                print(f"Timeout lors de la connexion WiFi après {timeout}s")
-                return None
+                #print(f"Timeout lors de la connexion WiFi après {timeout}s")
+                #return None
+                raise RuntimeError(f"Timeout lors de la connexion WiFi après {timeout}s")
 
             try:
                 wifi.radio.connect(ssid, pwd)
@@ -244,8 +245,9 @@ class SimpleWifi:
                     print(e)
 
                 if timeout and (time.monotonic() - timestamp) >= timeout:
-                    print(f"Timeout lors de la connexion WiFi après {timeout}s")
-                    return None
+                    #print(f"Timeout lors de la connexion WiFi après {timeout}s")
+                    #return None
+                    raise RuntimeError(f"Timeout lors de la connexion WiFi après {timeout}s")
                 pass
 
         
@@ -276,24 +278,12 @@ class SimpleWifi:
 
         # Si None, l'adaptateur n'existe pas - sortir immédiatement
         if eth_status is None:
-            print("Eth adapter not found")
+            #print("Eth adapter not found")
             gc.collect()
-            return None
+            #return None
+            raise RuntimeError("Eth adapter not found")
 
         timestamp_start = time.time()
-
-        ethernet.ifconfig("dhcp")
-        timestamp = time.time()
-        dhcp_timeout = 2.5 if static_ip else (timeout - (time.time() - timestamp_start) if timeout else None)
-
-        while not ethernet.isconnected():
-            if dhcp_timeout and (time.time() - timestamp) >= dhcp_timeout:
-                break
-
-        if not ethernet.isconnected() and not static_ip:
-            print(f"Timeout lors de la connexion Ethernet après {timeout}s")
-            ethernet.active(False)
-            gc.collect()
 
         ethernet.ifconfig("dhcp")
         timestamp = time.monotonic()
@@ -305,10 +295,11 @@ class SimpleWifi:
             pass
 
         if not ethernet.isconnected() and not static_ip:
-            print(f"Timeout lors de la connexion Ethernet après {timeout}s")
+            #print(f"Timeout lors de la connexion Ethernet après {timeout}s")
             ethernet.active(False)  # Désactiver Ethernet avant de sortir
             gc.collect()
-            return None
+            #return None
+            raise RuntimeError(f"Timeout lors de la connexion Ethernet après {timeout}s")
 
         c = list(ethernet.ifconfig())
         if static_ip:
@@ -550,6 +541,13 @@ class SimpleWifi:
             self.simple_tcp_http.close_client()
         else:
             self.simple_tcp.close_client()
+             
+    def close_connection_with_server(self):
+        """
+        Close existing socket
+
+        """
+        self.simple_tcp.close()
 
 class SimpleHttpRequest:
 
@@ -850,4 +848,4 @@ class SimpleHttp:
 
 
 def version():
-    return "1.0.25"
+    return "1.0.26"

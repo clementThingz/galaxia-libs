@@ -287,7 +287,7 @@ class SimpleWifi:
 
         ethernet.ifconfig("dhcp")
         timestamp = time.monotonic()
-        dhcp_timeout = 2.5 if static_ip else (timeout - (time.monotonic() - timestamp_start) if timeout else None)
+        dhcp_timeout = 5 if static_ip else (timeout - (time.monotonic() - timestamp_start) if timeout else None)
 
         while not ethernet.isconnected():
             if dhcp_timeout and (time.monotonic() - timestamp) >= dhcp_timeout:
@@ -303,6 +303,10 @@ class SimpleWifi:
 
         c = list(ethernet.ifconfig())
         if static_ip:
+            if c[1] == '0.0.0.0':
+                c[1] = '255.255.255.0'
+            if c[3] == '0.0.0.0':
+                c[3] = c[2]
             c[0] = static_ip
             if netmask:
                 c[1] = netmask
@@ -848,4 +852,4 @@ class SimpleHttp:
 
 
 def version():
-    return "1.0.26"
+    return "1.0.27"

@@ -342,7 +342,7 @@ class SimpleWifi:
         return self.ip_ap
 
     
-    def send(self, data, ip, port=2000, stopSequence="\r", waitResponse=False):
+    def send(self, data, ip, port=2000, stopSequence="\r", waitResponse=False, closeSocket=True):
         """
         Connect to IP and send data
 
@@ -384,7 +384,8 @@ class SimpleWifi:
                     if response.endswith(stopSequence):
                         break
             
-            self.simple_tcp.close()
+            if closeSocket:
+                self.simple_tcp.close()
             if waitResponse:
                 if not response:
                     return ""
@@ -545,6 +546,37 @@ class SimpleWifi:
             self.simple_tcp_http.close_client()
         else:
             self.simple_tcp.close_client()
+
+    def receive_from_server(self, stopSequence="\r", timeout=1):
+        """
+        Receive data from the server if a client socket is open (non-blocking)
+
+        :param stopSequence: set the end of message characters
+        :param timeout: timeout for each receive attempt (in seconds)
+        :return: A string containing the message, or empty string if no data
+        """
+        if not self.simple_tcp.client_socket:
+            return ""
+
+        data = bytearray()
+        while True:
+            try:
+                d = self.simple_tcp.receive(timeout)
+                if len(d) > 0:
+                    for b in d:
+                        data.append(b)
+                else:
+                    break
+            except:
+                break
+
+            response = data.decode("utf-8")
+            if response.endswith(stopSequence):
+                return response[:response.find(stopSequence)]
+
+        if len(data) > 0:
+            return data.decode("utf-8")
+        return ""
              
     def close_connection_with_server(self):
         """
@@ -852,4 +884,4 @@ class SimpleHttp:
 
 
 def version():
-    return "1.0.27"
+    return "1.0.28"

@@ -428,7 +428,7 @@ class SimpleWifi:
                 timestamp = time.monotonic()
                 while (timeout == None or (time.monotonic() - timestamp) < timeout):
                     force_timeout = 0
-                    if len(data) > 0 :
+                    if len(data) > 0 or block == False:
                         force_timeout = 1 #if reception started force timeout
                     
                     d = ""
@@ -446,12 +446,12 @@ class SimpleWifi:
                             data.append(b)
                     else:
                         if not timeout_triggered: #socket was closed on the other side
+                            
                             self.simple_tcp.close_client()
-                            break
-                        else:
-                            if verbose:
-                                print("Message de "+str(self.last_ip))
-                            return data.decode("utf-8")
+                            
+                        if verbose:
+                            print("Message de "+str(self.last_ip))
+                        return data.decode("utf-8")
 
                     request = data.decode("utf-8")
                     
@@ -884,4 +884,4 @@ class SimpleHttp:
 
 
 def version():
-    return "1.0.28"
+    return "1.0.29"

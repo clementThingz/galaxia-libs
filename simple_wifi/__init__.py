@@ -21,7 +21,8 @@ class SimpleTcp:
         if initClient:
             self.client_socket = _simple_tcp_socket_pool.socket(_simple_tcp_socket_pool.AF_INET, _simple_tcp_socket_pool.SOCK_STREAM)
         self.current_client = None
-    
+        self.current_client_read = False
+
     def start_server(self, ip=None, port=2000):
         if ip == None:
             ip = wifi.radio.ipv4_address
@@ -41,7 +42,8 @@ class SimpleTcp:
                     self.current_client[0].close()
 
                 self.current_client = self.server_socket.accept()
-                
+                self.current_client_read = False
+
             except OSError:
                 pass
             self.server_socket.setblocking(True)
@@ -64,6 +66,7 @@ class SimpleTcp:
 
             client[0].setblocking(True)
             self.current_client = client
+            self.current_client_read = False
             return client[1]
         except OSError as e:
             if debug:
@@ -81,7 +84,13 @@ class SimpleTcp:
     def has_client(self):
         if self.current_client:
             return True
-        return False
+        #accept a pending client without blocking, so it can be read later
+        if self.server_socket:
+            self.wait_client(0, debug=False)
+        return self.current_client is not None
+
+    def has_unread_client(self):
+        return self.current_client is not None and not self.current_client_read
 
     def stop_server(self):
         if self.server_socket:
@@ -91,24 +100,25 @@ class SimpleTcp:
         if not self.current_client:
             raise AttributeError("No client")
         buff = bytearray(256)
-        if timeout:
+        if timeout != None:
             self.current_client[0].settimeout(timeout)
-        try:
-            numbytes = self.current_client[0].recvfrom_into(buff)
-        except OSError as e:
-            
-            if timeout:
-                self.current_client[0].setblocking(True)
-                raise Exception("Timeout")
-            else:
-                print(e)
-            return bytearray()
-
-        if timeout:
-            self.current_client[0].setblocking(True)
-        
-        buff = buff[: numbytes[0]]
-        return buff
+        while True:
+            try:
+                numbytes = self.current_client[0].recvfrom_into(buff)
+                self.current_client_read = True
+                if timeout:
+                    self.current_client[0].setblocking(True)
+                buff = buff[: numbytes[0]]
+                return buff
+            except OSError as e:
+                if timeout:
+                    self.current_client[0].setblocking(True)
+                    raise Exception("Timeout")
+                else:
+                    if e.errno == 11 or e.errno == 116:
+                        continue
+                    print(e)
+                return bytearray()
 
     def send_to_client(self, data):
         if not self.current_client:
@@ -127,7 +137,8 @@ class SimpleTcp:
         if self.current_client:
             self.current_client[0].close()
         self.current_client = None
-    
+        self.current_client_read = False
+
     def connect(self, ip, port=2000):
         # if not self.client_socket:
         #     self.client_socket = _simple_tcp_socket_pool.socket(_simple_tcp_socket_pool.AF_INET, _simple_tcp_socket_pool.SOCK_STREAM)
@@ -407,21 +418,22 @@ class SimpleWifi:
         :param reuseClient: If a client is already connected, keep the connection and try to receive from this client again
         :return: A string containing the message
         """
-        #keep current client
-        if not reuseClient:
+        #keep current client, but don't drop a freshly accepted client
+        #that hasn't been read yet (e.g. accepted by has_client())
+        if not reuseClient and not self.simple_tcp.has_unread_client():
             self.simple_tcp.close_client()
 
         while True:
-            #wait for client only if we don't reuse the same
-            if not reuseClient or (not self.simple_tcp.has_client()):
-                client_ip = self.simple_tcp.wait_client(timeout if block else 0, debug=True if block else False)
-                #print(client_ip)
-                if not client_ip:
-                    if block:
-                        continue
-                    return ""
-            
-                self.last_ip = client_ip[0]
+            #wait_client returns the current client immediately if there is
+            #one (reused or already accepted), otherwise it waits for a new one
+            client_ip = self.simple_tcp.wait_client(timeout if block else 0, debug=False)
+            #print(client_ip)
+            if not client_ip:
+                if block:
+                    continue
+                return ""
+
+            self.last_ip = client_ip[0]
 
             if ip == None or str(self.last_ip) == str(ip):
                 data = bytearray()
@@ -884,4 +896,4 @@ class SimpleHttp:
 
 
 def version():
-    return "1.0.29"
+    return "1.0.30"
